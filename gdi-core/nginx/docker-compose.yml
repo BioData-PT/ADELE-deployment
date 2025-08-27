@@ -1,21 +1,24 @@
-# tutorial: 
 services:
-
   nginx:
     image: nginx:latest
+    restart: unless-stopped
+    networks:
+      - tre-core
     ports:
       - 80:80
       - 443:443
-    restart: always
     volumes:
-      - ./nginx/conf/:/etc/nginx/conf.d/:ro
-      - ./certbot/www/:/var/www/certbot/:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ./nginx/99-autoreload.sh:/docker-entrypoint.d/99-autoreload.sh  # Script to autoreload Nginx when certs are renewed
+      - ./nginx/confs_docker/:/etc/nginx/conf.d
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
 
   certbot:
-    image: certbot/certbot:latest
+    image: certbot/certbot
     volumes:
-      - ./certbot/www/:/var/www/certbot/:rw
-      - ./certbot/conf/:/etc/letsencrypt/:rw
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
 
 networks:
   tre-core:
