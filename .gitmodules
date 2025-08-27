@@ -7,3 +7,6 @@
 [submodule "gdi-core/storage-interfaces"]
 	path = gdi-core/storage
 	url = https://github.com/BioData-PT/ADELE-S-I
+[submodule "ADELE"]
+	path = ADELE
+	url = https://github.com/BioData-PT/ADELE
