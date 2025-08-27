@@ -1,0 +1,11 @@
+instance:
+  clientUrl: http://localhost:8667
+  persistentUrl: http://localhost:8667
+
+repository:
+    type: 5
+    blazegraph:
+        url: http://blazegraph:8080/blazegraph
+
+ping:
+    enabled: false

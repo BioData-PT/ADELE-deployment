@@ -1,0 +1,28 @@
+services:
+
+  nginx:
+    container_name: nginx
+    image: nginx:latest
+    restart: unless-stopped      
+    ports:
+      - 172.31.200.100:443:443  #:www
+        # certbot requires having the 80 port open for acme challenge
+      - 172.31.200.100:80:80  #:www
+
+    volumes:
+      - /opt/inesc-id/sites/docker-website-deployment/certbot/conf:/etc/letsencrypt:ro #added 2025
+      - /opt/inesc-id/sites/docker-website-deployment/certbot/data:/var/www/certbot:ro
+    networks:
+        - sites_net
+
+  certbot:
+    container_name: certbot
+    image: certbot/certbot:latest
+    volumes:
+      - /opt/inesc-id/sites/docker-website-deployment/certbot/conf:/etc/letsencrypt:rw
+      - /opt/inesc-id/sites/docker-website-deployment/certbot/logs:/var/log/letsencrypt:rw
+      - /opt/inesc-id/sites/docker-website-deployment/certbot/data:/var/www/certbot:rw
+    networks:
+        - sites_net
+
+networks:
