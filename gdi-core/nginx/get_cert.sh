@@ -3,8 +3,9 @@
 docker compose run --rm certbot certonly \
     --webroot --webroot-path=/var/www/certbot \
     --agree-tos --no-eff-email \
-    -d fdp.gdi.biodata.pt -d rems.gdi.biodata.pt \
-    -d inbox.gdi.biodata.pt -d login.gdi.biodata.pt \
-    -d download.gdi.biodata.pt
+    -d fdp.adele.inesc-id.pt -d rems.adele.inesc-id.pt \
+    -d inbox.adele.inesc-id.pt -d login.adele.inesc-id.pt \
+    -d download.adele.inesc-id.pt -d backoffice.adele.inesc-id.pt \
+    -d website.adele.inesc-id.pt -d website-api.adele.inesc-id.pt
 
 
