@@ -33,4 +33,3 @@ volumes:
 
 networks:
   tre-core:
-    external: True

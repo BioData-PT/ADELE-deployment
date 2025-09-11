@@ -1,0 +1,10 @@
+include:
+  - ADELE/docker-compose.yml
+  - gdi-core/nginx/docker-compose.yml
+  - gdi-core/fdp/docker-compose.yml
+  - gdi-core/storage/docker-compose.yml
+  - gdi-core/funnel-sk/docker-compose.yml
+  - gdi-core/rems/docker-compose.yml
+
+networks:
+  tre-core:

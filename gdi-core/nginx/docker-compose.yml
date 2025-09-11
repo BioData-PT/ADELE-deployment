@@ -22,5 +22,5 @@ services:
 
 networks:
   tre-core:
-    external: true
+    #  external: true
 
