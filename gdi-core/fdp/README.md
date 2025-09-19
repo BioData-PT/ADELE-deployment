@@ -11,3 +11,6 @@
 - Click "Edit profile" on Albert Einstein and change the password to something safe
 - You will need to use that same password when you configuring the ADELE backend
 
+## IMPORTANT: 
+For the data upload from the frontend is MANDATORY that the user creates a catalog manually in the FDP, and updates the FIX_FDP_CATALOG_LINK in the ADELE projects (.env)
+- 
