@@ -31,5 +31,5 @@ services:
 volumes:
   data:
 
-networks:
-  tre-core:
+#networks:
+  #tre-core:

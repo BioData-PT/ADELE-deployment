@@ -20,7 +20,7 @@ services:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
 
-networks:
-  tre-core:
-    #  external: true
+#networks:
+  #tre-core:
+      #external: true
 
