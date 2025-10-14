@@ -13,6 +13,19 @@ services:
       - ./nginx/confs_docker/:/etc/nginx/conf.d
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
+    depends_on:
+      s3inbox:
+        condition: service_started
+      download:
+        condition: service_started
+      app:
+        condition: service_started
+      adele-website-frontend:
+        condition: service_started
+      adele-website-backend:
+        condition: service_started
+      fdp-client:
+        condition: service_started
 
   certbot:
     image: certbot/certbot
