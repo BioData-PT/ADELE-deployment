@@ -32,6 +32,12 @@ services:
     volumes:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
+    depends_on:
+      nginx:
+        condition: service_started
+    # Check validity and renew certificates every 15 hours    
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 15h & wait $${!}; done;'"
+
 
 #networks:
   #tre-core:
