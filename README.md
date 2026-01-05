@@ -70,9 +70,9 @@ You can use `make -C gdi-core/rems api-key` to generate a random API key, in cas
 
 Also, instead of setting up the credentials in the shell, you can use the template .env file:
 ```bash
-cp credentials/credentials.sh.example credentials/credentials.sh
-vim credentials/credentials.sh
-source credentials/credentials.sh
+cp gdi-core/rems/credentials/credentials.sh.example gdi-core/rems/credentials/credentials.sh
+vim gdi-core/rems/credentials/credentials.sh
+source gdi-core/rems/credentials/credentials.sh
 ```
 
 - Setup the relevant credentials:
@@ -110,7 +110,7 @@ export ORG_OWNER_USER="<ORG OWNER USER ID>" # optional
 
 - Run the following command:
 ```bash
-bash scripts/create_org_owner_user.sh
+bash gdi-core/rems/scripts/create_org_owner_user.sh
 ```
 
 #### How to change credentials
