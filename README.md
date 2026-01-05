@@ -33,6 +33,11 @@ If any of these services is not behaving as expected, check the logs of the resp
 
 ## Configuration
 
+### LS AAI OIDC Client
+You need to register an OIDC client in LS AAI for the TRE to be able to
+
+TODO: ADD LINK TO LS AAI SERVICE REQUEST
+
 ### Nginx
 After modifying the configurations in `nginx/nginx/confs_docker/` and `nginx/get_cert.sh` to match your domains, run `bash get_cert.sh` and follow the steps to get valid HTTPS certificates using Let's Encrypt. Make sure that ports 80 and 443 are open in your firewall for the domains you are using.
 
@@ -124,3 +129,8 @@ You might want to change your credentials later, specially when going from test 
 - Change the values in FDP configuration using `vim gdi-core/fdp/config/application.properties` to match the public URL and the database credentials (if you changed them from the default ones)
 
 ### Storage & Interfaces
+- Change auth and OIDC redirect URLs for the storage component using `vim gdi-core/storage/docker-compose.yml`, you only need to change the domains and (possibly) the scheme.
+- Run `cp gdi-core/storage/.env.example gdi-core/storage/.env`
+- Change S3 and OIDC credentials in .env
+- Run `vim gdi-core/storage/config/config.yaml` and change auth.s3Inbox to match your inbox domain.
+- You might need to change the OIDC configuration URL as well as the trusted Visa issuers(config/iss.json) when transitioning from test environment to prod, but only if you change the OIDC provider (i.e., LS AAI or some mock) and/or the REMS instance used for issuing Visas.
