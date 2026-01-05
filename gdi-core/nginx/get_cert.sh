@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker compose run --rm certbot certonly \
+docker compose exec certbot certonly \
     --webroot --webroot-path=/var/www/certbot \
     --agree-tos --no-eff-email \
     --cert-name adele-certs \
