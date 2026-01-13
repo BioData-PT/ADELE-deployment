@@ -1,12 +1,12 @@
 [submodule "gdi-core/ADELE-Funnel"]
 	path = gdi-core/funnel-sk
-	url = https://github.com/BioData-PT/ADELE-Funnel
+	url = https://gitlab.inesc-id.pt/tre/adele-funnel
 [submodule "gdi-core/rems"]
 	path = gdi-core/rems
-	url = https://github.com/BioData-PT/ADELE-REMS
+	url = https://gitlab.inesc-id.pt/tre/adele-rems
 [submodule "gdi-core/storage-interfaces"]
 	path = gdi-core/storage
-	url = https://github.com/BioData-PT/ADELE-S-I
+	url = https://gitlab.inesc-id.pt/tre/adele-s-i
 [submodule "ADELE"]
 	path = ADELE
-	url = https://github.com/BioData-PT/ADELE
+	url = https://gitlab.inesc-id.pt/tre/adele
