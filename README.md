@@ -5,6 +5,14 @@ In the following section, the steps to deploy the ADELE TRE with all its compone
 - Docker and Docker Compose plugin
 - Git
 - Public URL (some services require valid HTTPS connection)
+- LS AAI account (see instructions below)
+
+## Get an LS AAI Account
+To login on the TRE you need to first create an LS AAI account. To do that, visit [LS AAI Login Page](https://perun.aai.lifescience-ri.eu/login) and sign in. It is preferable that you use the search bar to find an organization to which you belong, but you can also login using ORCID.
+After that, you'll need to register at 2 different groups using the following URLs: 
+- [LifeScience group](https://signup.aai.lifescience-ri.eu/fed/registrar/?vo=lifescience)
+- [LifeScience Test](https://signup.aai.lifescience-ri.eu/fed/registrar/?vo=lifescience_test)
+If everything went well, your LS AAI account is now ready to access the TRE!
 
 ## Changes before first start-up
 
@@ -34,9 +42,32 @@ If any of these services is not behaving as expected, check the logs of the resp
 ## Configuration
 
 ### LS AAI OIDC Client
-You need to register an OIDC client in LS AAI for the TRE to be able to
+You need to register an OIDC client in LS AAI for the TRE services to be able to use it as an Identity Provider.
+It is recommended to create a dedicated client for each service (e.g., one for REMS, one for Storage, and one for the website).
 
-TODO: ADD LINK TO LS AAI SERVICE REQUEST
+To register a service, you need to visit this [link](https://services.aai.lifescience-ri.eu/spreg/auth), go to "New Service" and fill the required fields. For reference, below you'll find a list of the common fields among all the services.
+
+When this is done, LS AAI will review your request and provide you with a client ID and a client secret that you'll need to use in the configuration of each service.
+
+#### Common fields
+- Authentication protocol: OIDC
+- Login URL: The URL of the product (*e.g.*, https://rems.gdi.biodata.pt)
+- Flows the service will use: authorization code
+- Token endpoint authentication type: client_secret_basic
+- PKCE type: SHA256 code challenge
+- Issue refresh tokens for this client: No
+- Step 4 of the registration: No need to check or fill anything
+
+#### Component-specific fields
+
+##### S&I
+- Scopes: openid, profile, email, ga4gh_passport_v1, eduperson_entitlement  
+- Redirect URI: base url  + */oidc/login* (e.g., https://login.tre.biodata.pt/oidc/login )
+
+##### REMS
+- Scopes: openid, profile, email, ga4gh_passport_v1
+- Redirect URI: base url + */oidc-callback* (*e.g.*, https://rems.tre.biodata.pt/oidc-callback)
+
 
 ### Nginx
 After modifying the configurations in `nginx/nginx/confs_docker/` and `nginx/get_cert.sh` to match your domains, run `bash get_cert.sh` and follow the steps to get valid HTTPS certificates using Let's Encrypt. Make sure that ports 80 and 443 are open in your firewall for the domains you are using.
