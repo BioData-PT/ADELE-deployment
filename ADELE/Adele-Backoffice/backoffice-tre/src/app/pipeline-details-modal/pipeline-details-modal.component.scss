@@ -1,0 +1,24 @@
+
+mat-form-field.full-width {
+  width: 100%;
+
+  textarea {
+    font-family: monospace;
+    white-space: pre;
+  }
+}
+
+mat-dialog-content {
+  max-height: 500px;
+  overflow: auto;
+  padding-top: 8px;
+  padding-bottom: 16px;
+}
+
+mat-dialog-actions {
+  padding-top: 8px;
+
+  button {
+    margin-left: 8px;
+  }
+}

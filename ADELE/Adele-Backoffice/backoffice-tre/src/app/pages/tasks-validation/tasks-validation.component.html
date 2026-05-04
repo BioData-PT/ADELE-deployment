@@ -1,0 +1,67 @@
+<div class="container py-4">
+  <h1 class="mb-3" style="color: var(--accent);">Tasks Validation</h1>
+  <p class="text-muted mb-4">Review and validate files submitted for processing.</p>
+
+  <div *ngIf="loading" class="alert alert-info">Loading files...</div>
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <div *ngIf="files && files.length > 0; else noFiles">
+    <div class="table-responsive">
+      <table class="table table-dark table-striped align-middle rounded">
+        <thead>
+          <tr>
+            <th>File Name</th>
+            <th>User</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let file of files">
+            <!-- Assuming file format is "user/filename" -->
+            <td>{{ file.split('/')[1] }}</td>
+            <td>{{ file.split('/')[0] }}</td>
+            <td>
+              <button class="btn btn-primary btn-sm me-2"
+                      (click)="previewFile(file.split('/')[0], file.split('/')[1])">
+                View
+              </button>
+              <button class="btn btn-success btn-sm me-2"
+                      (click)="approve(file.split('/')[0], file.split('/')[1])"
+                      [disabled]="loading">
+                Approve
+              </button>
+              <button class="btn btn-danger btn-sm"
+                      (click)="reject(file.split('/')[0], file.split('/')[1])"
+                      [disabled]="loading">
+                Reject
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <ng-template #noFiles>
+    <div class="alert alert-info mt-4">No files available for validation.</div>
+  </ng-template>
+
+  <!-- File Preview Modal -->
+  <div class="modal fade show" tabindex="-1" [ngStyle]="{'display': fileContent ? 'block' : 'none', 'background': 'rgba(0,0,0,0.7)'}" *ngIf="fileContent">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content bg-dark text-light">
+        <div class="modal-header">
+          <h5 class="modal-title">Preview: {{ selectedFile }}</h5>
+          <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="fileContent = null"></button>
+        </div>
+        <div class="modal-body">
+          <div *ngIf="fileContent">
+            <h5>File Preview (Read-Only)</h5>
+            <pre class="no-select" style="white-space: pre-wrap; word-wrap: break-word; max-height: 600px; overflow-y: auto;" (copy)="$event.preventDefault()">
+              {{ fileContent }}
+            </pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

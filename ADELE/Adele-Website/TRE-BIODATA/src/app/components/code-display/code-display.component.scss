@@ -1,0 +1,21 @@
+pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    background: #222;
+    color: #f8f8f8;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+    display: flex;
+    justify-content: space-between
+  }
+  
+.code-icon {
+    font-size: 24px;
+    color: #f8f8f8;
+    cursor: pointer;
+
+    &:hover {
+      color: #c4c3c3;
+    }
+  }

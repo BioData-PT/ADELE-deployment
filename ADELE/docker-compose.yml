@@ -1,0 +1,109 @@
+services:
+  mongodb:
+    image: mongo:latest
+    command: [ "mongod", "--bind_ip_all", "--port", "27017" ]
+    container_name: adele-mongodb
+    restart: always
+    #ports:
+    #  - "127.0.0.1:27017:27017"
+    volumes:
+      #- ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - adele_mongo_data:/data/db
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      timeout: 10s
+      start_period: 5s
+      retries: 3
+    networks:
+      - backend_db
+      - joint_fdp_website
+
+  adele-backoffice-frontend:
+    build:
+      context: ./Adele-Backoffice/backoffice-tre
+      dockerfile: Dockerfile.frontend
+    container_name: adele-backoffice-frontend
+    ports:
+      - "4300:80"
+    depends_on:
+      - adele-backoffice-backend
+    env_file:
+      - ../.env
+    networks:
+      - backoffice_frontend_backend
+      - tre-core
+    volumes:
+      - ./Adele-Backoffice/backoffice-tre:/app
+
+  adele-backoffice-backend:
+    build:
+      context: ./Adele-Backoffice/backend
+      dockerfile: Dockerfile
+    container_name: adele-backoffice-backend
+    ports:
+      - "8081:8081"
+    env_file:
+      - ../.env
+    environment:
+      - SHARED_DOCS_PATH=/documents
+    volumes:
+      - tre-shared-documents:/documents
+      - ./Adele-Backoffice/backend:/backend
+    depends_on:
+      - mongodb
+    networks:
+      - backoffice_frontend_backend
+      - backend_db
+      - tre-core
+
+  adele-website-frontend:
+    build:
+      context: ./Adele-Website/TRE-BIODATA
+      dockerfile: Dockerfile.frontend
+    container_name: adele-website-frontend
+    ports:
+      - "4200:80"
+    env_file:
+      - ../.env
+    depends_on:
+      - adele-website-backend
+    networks:
+      - website_frontend_backend
+      - tre-core
+    volumes:
+      - ./Adele-Website/TRE-BIODATA:/app
+
+
+  adele-website-backend:
+    build:
+      context: ./Adele-Website/backend
+      dockerfile: Dockerfile
+    container_name: adele-website-backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - ../.env
+    depends_on:
+      - mongodb
+    networks:
+      - website_frontend_backend
+      - backend_db
+      - tre-core
+    volumes:
+      - ./Adele-Website/backend/config:/backend/config
+      - ./Adele-Website/backend:/backend
+
+volumes:
+  adele_mongo_data:
+  tre-shared-documents:
+
+
+networks:
+  backoffice_frontend_backend:
+  backend_db:
+  website_frontend_backend:
+    driver: bridge
+  joint_fdp_website: # network so FDP and adele use the same mongodb instance
+  # tre-core:
+  #   external: true

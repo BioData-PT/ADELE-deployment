@@ -1,0 +1,17 @@
+<h2 mat-dialog-title>{{ isNewPipeline ? 'Create New Pipeline' : 'Edit Pipeline' }}</h2>
+<div mat-dialog-content>
+  <mat-form-field appearance="fill" class="full-width">
+    <textarea
+        matInput
+        cdkTextareaAutosize="true"
+        cdkAutosizeMinRows="15"
+        cdkAutosizeMaxRows="20"
+        [(ngModel)]="pipeline.payload"
+    ></textarea>
+  </mat-form-field>
+</div>
+
+<div mat-dialog-actions align="center">
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="savePipeline()">Save</button>
+</div>

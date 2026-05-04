@@ -1,0 +1,233 @@
+<div class="container py-4">
+  <!-- Page title -->
+  <div class="row mb-3">
+    <div class="col-12 text-center">
+      <h1 class="fw-semibold mb-1">Data Submission</h1>
+      <p class="text-muted mb-0">Encrypt your files with Crypt4GH and upload them securely to the TRE.</p>
+    </div>
+  </div>
+
+  <!-- Step 1: Authenticated key download + checksum -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <h2 class="h5 mb-3">Step 1 — Get the TRE public key</h2>
+      <div class="alert alert-info d-flex align-items-center justify-content-between flex-wrap">
+        <div class="me-3">
+          <div class="fw-medium">Download is authenticated &amp; audited.</div>
+          <small class="text-muted">You must be signed in and authorized to access the key.</small>
+        </div>
+        <button class="btn btn-primary btn-sm" (click)="downloadPKFile()" [disabled]="downloading">
+          {{ downloading ? 'Downloading…' : 'Download TRE.pub' }}
+        </button>
+      </div>
+
+      <div class="mt-3">
+        <div class="mb-1"><strong>SHA256 checksum for TRE.pub:</strong></div>
+        <app-code-display [code]="checksumLine || 'Loading…'"></app-code-display>
+        <details class="mt-2">
+          <summary class="fw-semibold text-primary" style="cursor:pointer;">How to verify the checksum</summary>
+          <div class="mt-2">
+            <div class="mb-1">After downloading <code>TRE.pub</code>, run the following command in your terminal and compare the output to the checksum above:</div>
+            <ul class="list-unstyled">
+              <li>
+                <span class="badge bg-light text-dark me-1">Linux</span>
+                <code>sha256sum TRE.pub</code>
+              </li>
+              <li>
+                <span class="badge bg-light text-dark me-1">macOS</span>
+                <code>shasum -a 256 TRE.pub</code>
+              </li>
+              <li>
+                <span class="badge bg-light text-dark me-1">Windows (PowerShell)</span>
+                <code>(Get-FileHash .\TRE.pub -Algorithm SHA256).Hash.ToLower()</code>
+              </li>
+            </ul>
+            <small class="text-muted">If the checksum matches, your download is correct.</small>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Install Crypt4GH -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <h2 class="h5 mb-3">Step 2 — Install Crypt4GH</h2>
+
+      <ul class="nav nav-pills mb-3" id="install-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="linux-tab" data-bs-toggle="tab" data-bs-target="#linux" type="button" role="tab">Linux</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="macos-tab" data-bs-toggle="tab" data-bs-target="#macos" type="button" role="tab">macOS</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="windows-tab" data-bs-toggle="tab" data-bs-target="#windows" type="button" role="tab">Windows</button>
+        </li>
+      </ul>
+
+      <div class="tab-content" id="install-tabs-content">
+        <!-- Linux -->
+        <div class="tab-pane fade show active" id="linux" role="tabpanel" aria-labelledby="linux-tab">
+          <p class="mb-2"><span class="badge bg-secondary">Linux</span> Install via <em>pip</em> or <em>pipx</em>:</p>
+          <app-code-display code="pipx install crypt4gh  # preferred&#10;# or&#10;pip install --user crypt4gh"></app-code-display>
+          <p class="mb-1"><strong>Verify:</strong></p>
+          <app-code-display code="crypt4gh --help"></app-code-display>
+        </div>
+
+        <!-- macOS -->
+        <div class="tab-pane fade" id="macos" role="tabpanel" aria-labelledby="macos-tab">
+          <p class="mb-2"><span class="badge bg-secondary">macOS</span> Install via <em>pip</em> or <em>pipx</em>:</p>
+          <app-code-display code="pipx install crypt4gh  # preferred&#10;# or&#10;pip install --user crypt4gh"></app-code-display>
+          <p class="mb-1"><strong>Verify:</strong></p>
+          <app-code-display code="crypt4gh --help"></app-code-display>
+        </div>
+
+        <!-- Windows -->
+        <div class="tab-pane fade" id="windows" role="tabpanel" aria-labelledby="windows-tab">
+          <p class="mb-2"><span class="badge bg-secondary">Windows</span> Install via Python + pipx (PowerShell):</p>
+          <app-code-display code="py -m pip install --user pipx&#10;pipx ensurepath&#10;pipx install crypt4gh"></app-code-display>
+          <p class="mb-1"><strong>Verify:</strong></p>
+          <app-code-display code="crypt4gh -h"></app-code-display>
+          <small class="text-muted">If PowerShell can’t find the command, restart your terminal.</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Encrypt the file(s) -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <h2 class="h5 mb-3">Step 3 — Encrypt your files with the TRE key</h2>
+
+      <ul class="nav nav-pills mb-3" id="enc-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="enc-linux-tab" data-bs-toggle="tab" data-bs-target="#enc-linux" type="button" role="tab">Linux</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="enc-macos-tab" data-bs-toggle="tab" data-bs-target="#enc-macos" type="button" role="tab">macOS</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="enc-windows-tab" data-bs-toggle="tab" data-bs-target="#enc-windows" type="button" role="tab">Windows</button>
+        </li>
+      </ul>
+
+      <div class="tab-content" id="enc-tabs-content">
+        <!-- Linux -->
+        <div class="tab-pane fade show active" id="enc-linux" role="tabpanel" aria-labelledby="enc-linux-tab">
+          <p class="mb-2"><span class="badge bg-secondary">Linux</span> Encrypt a single file:</p>
+          <app-code-display code="crypt4gh encrypt --recipient_pk TRE.pub &lt; filename &gt; filename.c4gh"></app-code-display>
+          <p class="mb-2">Encrypt multiple files in a folder:</p>
+          <app-code-display code="for f in *; do [ -f &quot;$f&quot; ] &amp;&amp; crypt4gh encrypt --recipient_pk TRE.pub &lt; &quot;$f&quot; &gt; &quot;$f.c4gh&quot;; done"></app-code-display>
+        </div>
+
+        <!-- macOS -->
+        <div class="tab-pane fade" id="enc-macos" role="tabpanel" aria-labelledby="enc-macos-tab">
+          <p class="mb-2"><span class="badge bg-secondary">macOS</span> Encrypt a single file:</p>
+          <app-code-display code="crypt4gh encrypt --recipient_pk TRE.pub &lt; filename &gt; filename.c4gh"></app-code-display>
+          <p class="mb-2">Encrypt multiple files in a folder (zsh/bash):</p>
+          <app-code-display code="for f in *; do [ -f &quot;$f&quot; ] &amp;&amp; crypt4gh encrypt --recipient_pk TRE.pub &lt; &quot;$f&quot; &gt; &quot;$f.c4gh&quot;; done"></app-code-display>
+        </div>
+
+        <!-- Windows -->
+        <div class="tab-pane fade" id="enc-windows" role="tabpanel" aria-labelledby="enc-windows-tab">
+          <p class="mb-2"><span class="badge bg-secondary">Windows (PowerShell)</span> Use a byte-stream pipeline (no &lt; / &gt; redirection):</p>
+          <app-code-display
+            code="Get-Content .\filename -AsByteStream |&#10;  crypt4gh encrypt --recipient_pk .\TRE.pub |&#10;  Set-Content .\filename.c4gh -AsByteStream">
+          </app-code-display>
+          <p class="mb-2">Encrypt all files in the current folder:</p>
+          <app-code-display
+            code="Get-ChildItem -File | ForEach-Object {&#10;  $in = $_.FullName;&#10;  $out = &quot;$($in).c4gh&quot;;&#10;  Get-Content $in -AsByteStream | crypt4gh encrypt --recipient_pk .\TRE.pub | Set-Content $out -AsByteStream&#10;}">
+          </app-code-display>
+          <p class="mb-2">Alternative (Command Prompt / <code>cmd.exe</code>):</p>
+          <app-code-display code="crypt4gh encrypt --recipient_pk TRE.pub &lt; filename &gt; filename.c4gh"></app-code-display>
+          <small class="text-muted">In PowerShell, <code>&lt;</code> and <code>&gt;</code> don’t behave like in Unix shells—use the pipeline shown above.</small>
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <small class="text-muted">
+          Your <strong>public key</strong> file must be a Crypt4GH key (it starts with <code>-----BEGIN CRYPT4GH PUBLIC KEY-----</code>).
+          Do not use SSH/PGP keys.
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: Upload -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <h2 class="h5 mb-3">Step 4 — Upload your encrypted file</h2>
+      <p class="mb-3">Use the area below to upload the <code>.c4gh</code> file(s) you created.</p>
+
+      <div class="file-upload-container">
+        <input type="file" id="fileInput" (change)="onFileSelected($event)" [attr.maxSize]="2 * 1024 * 1024 * 1024" hidden />
+        <div class="drop-zone d-flex flex-column align-items-center justify-content-center p-4 border border-2 rounded-3"
+             (drop)="onDrop($event)" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+             [class.active]="dragActive" style="min-height: 180px;">
+          <p class="mb-1"><strong>Drag &amp; drop</strong> your encrypted file here</p>
+          <p class="text-muted mb-2">or <label for="fileInput" class="upload-link text-decoration-underline" role="button">browse</label></p>
+          <p *ngIf="selectedFile" class="mb-0">
+            Selected: <code>{{ selectedFile.name }}</code>
+            <span class="text-muted"> ({{ selectedFile.size | number }} bytes)</span>
+          </p>
+        </div>
+
+        <div *ngIf="!isValidFile()" class="text-danger mt-2">
+          {{ error_message }}
+        </div>
+
+        <button class="btn btn-primary mt-3" [disabled]="!isValidFile()" (click)="uploadFile()">
+          Upload File
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 5: Uploaded files table -->
+  <div *ngIf="uploadedFiles && uploadedFiles.length > 0" class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <h2 class="h5 mb-3">Uploaded Files</h2>
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">File Name</th>
+              <th scope="col">Upload Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let file of uploadedFiles">
+              <td><code>{{ file.filename }}</code></td>
+              <td>
+                <span *ngIf="file.upload_time">{{ file.upload_time | date:'medium' }}</span>
+                <span *ngIf="!file.upload_time" class="text-muted">Unknown</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info / Troubleshooting -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+      <h3 class="h6 mb-3">About Crypt4GH</h3>
+      <p class="mb-2">
+        <strong>Crypt4GH</strong> is a secure file format and encryption tool for genomic data, created by GA4GH.
+        It encrypts files so only authorized recipients can decrypt them.
+      </p>
+      <p class="mb-3">
+        See the <a href="https://github.com/EGA-archive/crypt4gh" target="_blank" rel="noopener">official Crypt4GH repository</a>.
+      </p>
+
+      <h4 class="h6">Troubleshooting</h4>
+      <ul class="mb-0">
+        <li><strong>Windows</strong>: In PowerShell, use the pipeline method shown above; redirection <code>&lt;</code>/<code>&gt;</code> may corrupt binary data.</li>
+        <li><strong>“command not found”</strong>: Ensure <code>crypt4gh</code> is on your PATH (restart terminal after install, or use pipx).</li>
+        <li><strong>Wrong key type</strong>: The TRE key must be a Crypt4GH public key, not an SSH/PGP key.</li>
+      </ul>
+    </div>
+  </div>
+</div>

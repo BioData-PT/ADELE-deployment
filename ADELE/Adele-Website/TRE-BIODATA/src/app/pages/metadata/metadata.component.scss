@@ -1,0 +1,76 @@
+.steps {
+    margin-top: 40px;
+  }
+  
+  .step {
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+  }
+  
+  .step:hover {
+    background-color: rgb(13, 110, 253);
+    color: white;
+    transform: translateY(-5px);
+  }
+  
+  .step h3 {
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+  
+  .step p {
+    font-size: 1rem;
+    color: #171717;
+  }
+  
+  .step:hover h3 {
+    color: white;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 1200px) {
+    h1 {
+      font-size: 2.2rem;
+    }
+  
+    h2 {
+      font-size: 1.8rem;
+    }
+  
+    h3 {
+      font-size: 1.4rem;
+    }
+  
+    .step {
+      padding: 15px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .metadata-page {
+      padding: 15px;
+    }
+  
+    h1 {
+      font-size: 1.8rem;
+    }
+  
+    h2 {
+      font-size: 1.6rem;
+    }
+  
+    h3 {
+      font-size: 1.3rem;
+    }
+  
+    .steps {
+      margin-top: 30px;
+    }
+  
+    .step {
+      padding: 10px;
+    }
+}

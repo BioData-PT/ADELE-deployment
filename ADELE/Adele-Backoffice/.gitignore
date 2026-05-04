@@ -1,0 +1,29 @@
+# Secrets and credentials
+.env
+backend/.env
+*.pem
+*.key
+*.crt
+
+# Node.js
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+
+# macOS / Windows / Linux system files
+.DS_Store
+Thumbs.db
+
+# Logs and temp files
+*.log
+*.tmp
+
+# IDE files
+.vscode/
+.idea/

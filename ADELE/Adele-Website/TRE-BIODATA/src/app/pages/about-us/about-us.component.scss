@@ -1,0 +1,120 @@
+$primary-color: #0077b6;
+$secondary-color: #023e8a;
+$light-grey: #f8f9fa;
+$text-color: #333;
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: $light-grey;
+  color: $text-color;
+  margin: 0;
+  padding: 0;
+}
+
+.about-adele {
+  max-width: 1200px;
+  margin: auto;
+  padding: 2rem;
+}
+
+.hero {
+  text-align: center;
+  padding: 2rem 0;
+  background-color: $primary-color;
+  color: white;
+}
+
+.hero h1 {
+  margin-bottom: 0.5rem;
+}
+
+.intro {
+  padding: 2rem 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.five-safes {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  margin-bottom: 2rem;
+}
+
+.five-safes h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: $secondary-color;
+}
+
+.safes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.safe-item {
+  background-color: $light-grey;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 0 5px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+}
+
+.safe-item:hover {
+  transform: scale(1.03);
+}
+
+.safe-item i {
+  font-size: 1.5rem;
+  color: $primary-color;
+  margin-bottom: 0.5rem;
+}
+
+.technical, .security {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  margin-bottom: 2rem;
+}
+
+.technical h2, .security h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: $secondary-color;
+}
+
+.security-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.security-list li {
+  margin-bottom: 1rem;
+  padding-left: 1rem;
+  position: relative;
+}
+
+.security-list li::before {
+  content: '\f00c';
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  color: $primary-color;
+  position: absolute;
+  left: 0;
+}
+
+.footer {
+  text-align: center;
+  padding: 1rem 0;
+  color: #888;
+  font-size: 0.9rem;
+  border-top: 1px solid #ddd;
+  margin-top: 2rem;
+}

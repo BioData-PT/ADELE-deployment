@@ -1,0 +1,44 @@
+<!-- list component -->
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Description</th>
+            <th scope="col">Status</th>
+            <th scope="col">Last Update</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let project of projects">
+            <td>{{ project.title }}</td>
+            <td>{{ project.description }}</td>
+            <td>
+              <span *ngIf="getMainStepIndex(project.status) == 0" class="badge-status project">Project</span>
+              <span *ngIf="getMainStepIndex(project.status) == 1" class="badge-status dpa">DPA</span>
+              <span *ngIf="getMainStepIndex(project.status) == 2" class="badge-status metadata">Metadata</span>
+              <span *ngIf="getMainStepIndex(project.status) == 3" class="badge-status data-upload">Data Upload</span>
+              <span *ngIf="getMainStepIndex(project.status) == 4" class="badge-status online">Online</span>
+            </td>
+            <td class="last-update">{{ project.last_update | date:'yyyy-MM-dd' }}</td>
+            <td>
+              <button mat-icon-button [routerLink]="['/projects', project.id]" matTooltip="View Project Details">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+
+
+

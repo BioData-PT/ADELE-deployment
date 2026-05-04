@@ -1,0 +1,52 @@
+<div class="container">
+    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+      <div class="col-md-3 mb-2 mb-md-0">
+        <!-- INESC-ID LOGO AND LINK-->
+        <a  href="https://www.inesc-id.pt/" class="d-inline-flex link-body-emphasis text-decoration-none">
+          <img class="bi" height="100" src="assets/img/INESC-IDLogo.png" alt="">
+        </a>
+      </div>
+
+      <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0 center-nav">
+        <li><a routerLink="/" class="nav-link px-2 link-secondary">Home</a></li>
+        <!-- TODO: UPDATE LINK AFTER -->
+        <li><a href="{{ environment.fdpUri }}" class="nav-link px-2" target="_blank" rel="noopener">Data Discovery</a></li>
+        <li><a routerLink="/tutorials" class="nav-link px-2">Tutorials</a></li>
+        <li><a href="/about" class="nav-link px-2">About</a></li>
+      </ul>
+
+      <div class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
+          <img 
+          src="assets/img/LsLoginLogo.png" 
+          alt="Login" 
+          class="login-button" 
+          *ngIf="!isLogged()" 
+          (click)="login()"
+          />
+      </div>
+      
+      
+      <div class="d-flex align-items-center" *ngIf="isLogged()"> 
+        
+      <app-avatar [name]="userData['name']"></app-avatar>
+      
+      <c-dropdown *ngIf="isLogged()">
+        <a cButton cDropdownToggle aria-expanded="false">
+        </a>
+        <ul cDropdownMenu>
+          <li><a [routerLink]="['projects']" cDropdownItem>My projects</a></li>
+          <li><a [routerLink]="['tasks']" cDropdownItem>My tasks</a></li>
+          <li><a [routerLink]="[]" cDropdownItem>Profile</a></li>
+          <li><hr cDropdownDivider></li>
+          <li><button cDropdownItem (click)="logout()">Sign out</button></li>
+        </ul>
+      </c-dropdown> 
+    </div>
+
+    </header>
+  </div>
+
+
+  <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
+
+

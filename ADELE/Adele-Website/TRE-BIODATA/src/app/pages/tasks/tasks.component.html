@@ -1,0 +1,38 @@
+<!-- List the user tasks -->
+<div class="container">
+  <h1 class="text-center">Tasks</h1>
+    
+    <div class="row">
+    <button class="btn btn-primary" (click)="createTask()">Create Task</button>
+    <button class="btn btn-secondary" (click)="refreshTasks()">Refresh Tasks</button>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Task ID</th>
+                <th>Pipeline ID</th>
+                <th>File ID</th>
+                <th>Status</th>
+                <th>Created At</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let task of tasks">
+                <td>{{ task.id }}</td>
+                <td>{{ task.pipeline_id }}</td>
+                <td>{{ task.file_id }}</td>
+                <td>{{ task.status }}</td>
+                <td>{{ task.created_at | date:'short' }}</td>
+                <td>
+                    <button *ngIf="task.status == 'COMPLETED'" class="btn btn-success" (click)="generatePresignedUri(task)">Download File</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+  </div>
+
+</div>

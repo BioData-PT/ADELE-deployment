@@ -1,0 +1,38 @@
+# FROM busybox AS builder
+
+# RUN busybox --install /bin
+
+# FROM harbor.nbis.se/gdi/sda-download:20240415
+
+# # add gomplate to image, so we can use go templates
+# COPY --from=hairyhenderson/gomplate:stable /gomplate /bin/gomplate
+
+# # add basic shell things so we can run docker-entrypoint.sh
+# # Copy the fully prepared /bin from builder
+# COPY --from=builder /bin /bin
+# #RUN ["/bin/busybox", "--install", "/bin"]
+
+# # load our entrypoint instead of catalina directly
+# CMD ["docker-entrypoint.sh"]
+# #CMD ["sleep", "inf"]
+
+FROM harbor.nbis.se/gdi/sda-download:20240415 AS nbis
+
+FROM alpine:3.20
+
+# install minimal runtime tools (optional but useful)
+RUN apk add --no-cache bash ca-certificates
+
+# copy sda-download binary
+COPY --from=nbis /usr/bin/sda-download /usr/local/bin/sda-download
+
+# # add gomplate to image, so we can use go templates
+COPY --from=hairyhenderson/gomplate:stable /gomplate /usr/local/bin/gomplate
+
+# Your entrypoint script
+COPY docker-entrypoint-sdadownload.sh /usr/bin/docker-entrypoint.sh
+RUN chmod +x /usr/bin/docker-entrypoint.sh
+
+WORKDIR /
+
+ENTRYPOINT ["/usr/bin/docker-entrypoint.sh"]

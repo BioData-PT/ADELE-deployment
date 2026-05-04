@@ -1,0 +1,77 @@
+<div class="agreements-fragment-container">
+  <!-- Template Selection (disabled if already assigned) -->
+  <div *ngIf="!project.templateFiles?.length" class="agreements-section">
+    <div class="agreements-card">
+      <div class="agreements-card-header">
+        <h3>Select Agreement Templates</h3>
+      </div>
+      <div class="agreements-card-body">
+        <div class="mb-3">
+          <ul class="list-unstyled">
+            <li *ngFor="let template of templates" class="mb-2">
+              <label class="form-check d-flex align-items-center">
+                <input type="checkbox" [(ngModel)]="template.selected" class="form-check-input me-2" />
+                <span class="form-check-label">{{ template.filename }}</span>
+              </label>
+            </li>
+          </ul>
+        </div>
+        <button (click)="assignTemplates()" class="agreements-btn primary">Assign to Project</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assigned Templates -->
+  <div *ngIf="!signedDocuments" class="agreements-section">
+    <div class="agreements-card">
+      <div class="agreements-card-header">
+        <h3>Assigned Agreements</h3>
+      </div>
+      <div class="agreements-card-body">
+        <ul class="agreements-list">
+          <li *ngFor="let file of project.templateFiles" class="agreements-list-item">
+            <span>{{ file.filename }}</span>
+            <span [ngClass]="file.uploaded ? 'agreements-badge success' : 'agreements-badge danger'">
+              {{ file.uploaded ? 'Signed' : 'Not Signed' }}
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Signed File Review -->
+  <div *ngIf="signedDocuments" class="agreements-section">
+    <div class="agreements-card">
+      <div class="agreements-card-header">
+        <h3>Review Signed Documents</h3>
+      </div>
+      <div class="agreements-card-body">
+        <ul class="agreements-review-list">
+          <li *ngFor="let signed of project.userSignedFiles" class="agreements-review-item">
+            <div class="agreements-review-box">
+              <div class="agreements-review-header">
+                <a href="{{ getDownloadUri(signed) }}" target="_blank" class="agreements-link">
+                  {{ signed.filename }}
+                </a>
+                <span [ngClass]="signed.verified ? 'agreements-badge success' : 'agreements-badge warning'">
+                  {{ signed.verified ? 'Approved' : 'Pending Review' }}
+                </span>
+              </div>
+              <div *ngIf="!signed.verified" class="agreements-review-actions">
+                <textarea [(ngModel)]="signed.feedback" maxlength="300" placeholder="Optional feedback..." class="agreements-feedback"></textarea>
+                <div class="agreements-action-buttons">
+                  <button (click)="approveFile(signed)" class="agreements-btn success">Approve</button>
+                  <button (click)="rejectFile(signed)" class="agreements-btn danger">Reject</button>
+                </div>
+              </div>
+              <div *ngIf="signed.verified && signed.feedback" class="agreements-feedback-view">
+                <strong>Feedback:</strong> {{ signed.feedback }}
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

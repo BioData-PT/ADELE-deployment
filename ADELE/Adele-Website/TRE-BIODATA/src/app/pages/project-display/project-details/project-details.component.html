@@ -1,0 +1,81 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <mat-stepper
+        [linear]="false"
+        #stepper
+        [selectedIndex]="getMainStepIndex()"
+      >
+        <!-- Project Submission Step -->
+        <mat-step label="Project Submission" [editable]="false">
+          <ng-template matStepLabel> Project Register </ng-template>
+          <ng-container *ngIf="isCurrentPhase('project')">
+            <ng-container [ngTemplateOutlet]="projectTemplate"></ng-container>
+          </ng-container>
+        </mat-step>
+
+        <!-- Data Processing Agreement Step -->
+         <mat-step
+          label="Data Processing Agreement Signature"
+          [editable]="false"
+        >
+          <ng-template matStepLabel> Legal Agreements </ng-template>
+          <ng-container *ngIf="isCurrentPhase('agreement')">
+            <ng-container [ngTemplateOutlet]="dpaTemplate"></ng-container>   
+          </ng-container>
+        </mat-step> 
+
+        <!-- Metadata Submission Step -->
+        <mat-step label="Metadata Submission" [editable]="false">
+          <ng-template matStepLabel> Metadata Submission </ng-template>
+          <ng-container *ngIf="isCurrentPhase('metadata')">
+            <ng-container [ngTemplateOutlet]="metadataTemplate"></ng-container>
+          </ng-container>
+        </mat-step>
+
+        <!-- Data Submission Step -->
+        <mat-step label="Data Submission" [editable]="false">
+          <ng-template matStepLabel> Data Upload </ng-template>
+          <ng-container *ngIf="isCurrentPhase('data')">
+            <ng-container [ngTemplateOutlet]="dataTemplate"></ng-container>
+          </ng-container>
+        </mat-step>
+
+        <!-- Done Step -->
+        <mat-step label="Completion" [editable]="false">
+          <ng-template matStepLabel> Done </ng-template>
+          <p>Submission process is complete.</p>
+        </mat-step>
+      </mat-stepper>
+    </div>
+  </div>
+
+  <!-- Templates for Different Forms -->
+  <ng-template #projectTemplate>
+    <app-project-form 
+      *ngIf="project" 
+      [project]="project">
+    </app-project-form>
+  </ng-template>
+
+   <ng-template #dpaTemplate>
+      <app-file-management
+      [project_id]="project.id" [status]="project.status"
+    ></app-file-management>
+  </ng-template> 
+
+  <ng-template #metadataTemplate>
+    <app-metadata-form *ngIf="project" [project]="project"></app-metadata-form>
+  </ng-template>
+
+  <ng-template #dataTemplate>
+    
+    <div class="container">
+      <mat-card class="card">
+        <app-data-upload [projectId]="project.id"></app-data-upload>
+      </mat-card>
+    </div>
+    
+
+  </ng-template>
+</div>

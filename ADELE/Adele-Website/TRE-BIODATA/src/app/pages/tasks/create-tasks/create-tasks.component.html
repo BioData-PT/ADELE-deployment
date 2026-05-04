@@ -1,0 +1,58 @@
+<mat-toolbar color="primary">
+  <span>Create Task</span>
+</mat-toolbar>
+
+<div class="page-container">
+
+  <!-- Grid layout -->
+  <div class="main-grid">
+
+    <!-- Files -->
+    <div class="section">
+      <h3 class="section-title">Datasets & Files</h3>
+      <div *ngFor="let dataset of datasets">
+        <div class="dataset-title">{{ dataset.name }}</div>
+        <div class="item-card" *ngFor="let file of availableFiles[dataset.id]" (click)="selectFile(file)">
+          <div class="item-name">{{ file.id }}</div>
+          <div class="item-status">{{ file.status }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Task Form -->
+    <div class="section">
+      <h3 class="section-title">Run Task</h3>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>File ID</mat-label>
+        <input matInput [(ngModel)]="file_id" placeholder="Enter File ID">
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Pipeline ID</mat-label>
+        <input matInput [(ngModel)]="pipeline_id" placeholder="Enter Pipeline ID">
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" class="full-width" (click)="submitTask()" [disabled]="is_processing">
+        Submit Task
+      </button>
+
+      <p *ngIf="status_message" class="status" [ngClass]="{
+          'processing': is_processing,
+          'error': status_message.includes('Error'),
+          'success': !is_processing && !status_message.includes('Error')
+        }">{{ status_message }}</p>
+    </div>
+
+        <!-- Pipelines -->
+    <div class="section">
+      <h3 class="section-title">Pipelines</h3>
+      <div class="item-card" *ngFor="let pipeline of pipelines" (click)="selectPipeline(pipeline)">
+        <div class="item-id">{{ pipeline.id }}</div>
+        <div class="item-name">{{ pipeline.name }}</div>
+        <div class="item-desc">{{ pipeline.description }}</div>
+      </div>
+    </div>
+
+  </div>
+

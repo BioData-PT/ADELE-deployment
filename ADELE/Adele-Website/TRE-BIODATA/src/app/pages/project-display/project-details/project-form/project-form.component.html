@@ -1,0 +1,254 @@
+<div class="container mt-4" *ngIf="project.status === 'P-E'">
+  <!-- Project Form Header -->
+  <h1>Submit your project details</h1>
+  <!-- Project Form -->
+  <form [formGroup]="projectForm" (change)="onFormChange()" (ngSubmit)="onSubmit()">
+    <!-- Title -->
+    <div class="mb-3">
+      <mat-form-field class="w-100">
+        <mat-label>Title</mat-label>
+        <input matInput formControlName="title" [disabled]="isFormLocked()" required>
+        <mat-icon matSuffix>title</mat-icon>
+        <mat-error *ngIf="isInvalid('title')">Title is required.</mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Description -->
+    <div class="mb-3">
+      <mat-form-field class="w-100">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description" rows="3" required></textarea>
+        <mat-icon matSuffix>description</mat-icon>
+        <mat-error *ngIf="isInvalid('description')">Description is required.</mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Organization -->
+    <div class="mb-3">
+      <mat-form-field class="w-100">
+        <mat-label>Organization</mat-label>
+        <input matInput formControlName="organization"  required>
+        <mat-icon matSuffix>business</mat-icon>
+        <mat-error *ngIf="isInvalid('organization')">Organization is required.</mat-error>
+      </mat-form-field>
+    </div>
+
+      <!-- PII -->
+      <div class="mb-3">
+        <mat-form-field class="w-100">
+          <mat-label>Principal Investigator (email)</mat-label>
+          <input matInput type="email" formControlName="responsable" required>
+          <mat-icon matSuffix>person</mat-icon>
+          <mat-error *ngIf="isInvalid('responsable')">Principal Investigator EMAIL is required.</mat-error>
+          <!--
+          Represents the individual who will be responsible for receiving notifications related to this project.
+          This person will be the main point of contact for all project notifications.
+          -->
+          <mat-hint>Email for receiving notifications about this project.</mat-hint>
+        </mat-form-field>
+      </div>
+
+    <!-- Expiration Date -->
+    <div class="mb-3">
+      <mat-form-field class="w-100">
+        <mat-label>Expiration Date</mat-label>
+        <input matInput type="date" formControlName="expiration_date" required>
+        <mat-icon matSuffix>event</mat-icon>
+        <mat-error *ngIf="isInvalid('expiration_date')">Expiration Date is required.</mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Data Storage Selection 
+    <div class="mb-3">
+      <mat-icon class="me-2">storage</mat-icon> Data Storage Option:
+      <div class="form-check">
+        <input class="form-check-input" type="radio" id="1" [value]="true" [(ngModel)]="this.project.internal_storage" formControlName="internal_storage">
+        <label class="form-check-label" for="1">
+          Use TRE Database (Submit Data)
+        </label>
+        <small class="text-muted d-block">Your project will store and process data within our system.</small>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" id="0" [value]="false" [(ngModel)]="this.project.internal_storage" formControlName="internal_storage">
+        <label class="form-check-label" for="0">
+          Keep Data Externally
+        </label>
+        <small class="text-muted d-block">You will manage the data independently and only provide metadata.</small>
+      </div>
+    </div>-->
+
+    <!-- Submit Button -->
+    <div class="row">
+      <div class="col-md-12">
+        <button class="btn btn-primary w-45" *ngIf="project.status === 'P-E'" [disabled]="projectForm.invalid" type="submit">
+          <mat-icon class="me-1">send</mat-icon> Submit
+        </button>
+        <button class="btn btn-primary w-45" *ngIf="project.status === 'P-E'" type="cancel" (click)="onCancel()">
+          <mat-icon class="me-1">cancel</mat-icon> Discard
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+
+<div class="container mt-4" *ngIf="project.status === 'P-AR'">
+  <!-- Project Form Header -->
+   <h1>Project Submitted</h1>
+
+  <!-- Project Status -->
+  <div class="alert alert-info d-flex align-items-center">
+    <mat-icon class="me-2">info</mat-icon>
+    <span>This project is currently under review. You cannot edit it. Please wait or contact the administrator if you need assistance.</span>
+  </div>
+
+  <!-- Project Details Card -->
+  <div class="card shadow-lg">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0"><mat-icon class="me-2">folder</mat-icon> Project Information</h5>
+    </div>
+    <div class="card-body">
+      <!-- Title -->
+      <div class="mb-3">
+        <strong><mat-icon class="me-2">title</mat-icon> Title:</strong>
+        <p class="form-control-plaintext">{{ project.title || 'N/A' }}</p>
+      </div>
+
+      <!-- Description -->
+      <div class="mb-3">
+        <strong><mat-icon class="me-2">description</mat-icon> Description:</strong>
+        <p class="form-control-plaintext">{{ project.description || 'N/A' }}</p>
+      </div>
+
+      <!-- Organization -->
+      <div class="mb-3">
+        <strong><mat-icon class="me-2">business</mat-icon> Organization:</strong>
+        <p class="form-control-plaintext">{{ project.organization || 'N/A' }}</p>
+      </div>
+
+      <!-- Principal Investigator -->
+      <div class="mb-3">
+        <strong><mat-icon class="me-2">person</mat-icon> Principal Investigator:</strong>
+        <p class="form-control-plaintext">{{ project.responsable || 'N/A' }}</p>
+      </div>
+
+      <!-- Expiration Date -->
+      <div class="mb-3">
+        <strong><mat-icon class="me-2">event</mat-icon> Expiration Date:</strong>
+        <p class="form-control-plaintext">{{ project.expiration_date || 'N/A' }}</p>
+      </div>
+
+      <!-- Data Storage Option
+      <div class="mb-3">
+        <strong><mat-icon class="me-2">storage</mat-icon> Data Storage Option:</strong>
+        <p class="form-control-plaintext">{{ project.internal_storage ? 'Use TRE Database (Submit Data)' : 'Keep Data Externally' }}</p>
+      </div> -->
+
+      <!-- Status -->
+      <div class="mb-3">
+        <strong><mat-icon class="me-2">hourglass_top</mat-icon> Status:</strong>
+        <span class="badge bg-warning text-dark">Under Review</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Admin -->
+  <div class="text-center mt-4">
+    <button class="btn btn-outline-danger" (click)="contactAdmin()">
+      <mat-icon class="me-1">support_agent</mat-icon> Contact Administrator
+    </button>
+  </div>
+</div>
+
+<div class="container mt-4" *ngIf="project.status === 'P-R'">
+  <!-- Rejection Notice -->
+   
+  <h1>Project Rejected</h1>
+
+
+  <div class="alert alert-danger d-flex align-items-center">
+    <mat-icon class="me-2">error</mat-icon>
+    <span>This project was <strong>not approved</strong>. You can edit and resubmit it or delete the proposal.</span>
+  </div>
+
+  <!-- Project Details Card -->
+  <div class="card shadow-lg">
+    <div class="card-header bg-danger text-white">
+      <h5 class="mb-0"><mat-icon class="me-2">folder_off</mat-icon> Rejected Project Details</h5>
+    </div>
+    <div class="card-body">
+      <!-- Title -->
+      <div class="mb-3">
+        <strong><mat-icon class="me-2">title</mat-icon> Title:</strong>
+        <p class="form-control-plaintext">{{ project.title || 'N/A' }}</p>
+      </div>
+
+      <!-- Description -->
+      <div class="mb-3">
+        <strong><mat-icon class="me-2">description</mat-icon> Description:</strong>
+        <p class="form-control-plaintext">{{ project.description || 'N/A' }}</p>
+      </div>
+
+      <!-- Organization -->
+      <div class="mb-3">
+        <strong><mat-icon class="me-2">business</mat-icon> Organization:</strong>
+        <p class="form-control-plaintext">{{ project.organization || 'N/A' }}</p>
+      </div>
+
+      <!-- Principal Investigator -->
+      <div class="mb-3">
+        <strong><mat-icon class="me-2">person</mat-icon> Principal Investigator:</strong>
+        <p class="form-control-plaintext">{{ project.responsable || 'N/A' }}</p>
+      </div>
+
+      <!-- Expiration Date -->
+      <div class="mb-3">
+        <strong><mat-icon class="me-2">event</mat-icon> Expiration Date:</strong>
+        <p class="form-control-plaintext">{{ project.expiration_date || 'N/A' }}</p>
+      </div>
+
+      <!-- Data Storage Option 
+      <div class="mb-3">
+        <strong><mat-icon class="me-2">storage</mat-icon> Data Storage Option:</strong>
+        <p class="form-control-plaintext">{{ project.internal_storage ? 'Use TRE Database (Submit Data)' : 'Keep Data Externally' }}</p>
+      </div>-->
+
+      <!-- Status -->
+      <div class="mb-3">
+        <strong><mat-icon class="me-2">cancel</mat-icon> Status:</strong>
+        <span class="badge bg-danger">Rejected</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="text-center mt-4">
+    <button class="btn btn-warning me-2" (click)="editProject()">
+      <mat-icon class="me-1">edit</mat-icon> Edit Proposal
+    </button>
+    <button class="btn btn-outline-danger" (click)="confirmDelete()">
+      <mat-icon class="me-1">delete</mat-icon> Delete Proposal
+    </button>
+  </div>
+
+  <!-- Confirmation Modal -->
+<!--   <div *ngIf="showDeleteModal" class="modal fade show d-block" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title"><mat-icon class="me-2">warning</mat-icon> Confirm Deletion</h5>
+          <button type="button" class="btn-close" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to <strong>delete</strong> this project proposal? This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+          <button type="button" class="btn btn-danger" (click)="deleteProject()">
+            <mat-icon class="me-1">delete_forever</mat-icon> Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div> -->
+</div>

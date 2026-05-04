@@ -1,0 +1,39 @@
+<h2>Projects</h2>
+
+<mat-table [dataSource]="projects" class="mat-elevation-z8">
+  <ng-container matColumnDef="title">
+    <mat-header-cell *matHeaderCellDef> Project Title </mat-header-cell>
+    <mat-cell *matCellDef="let project">
+      <!-- Highlight project name if it requires admin action -->
+      <span *ngIf="projectNotification(project)" class="highlight">
+        <strong>{{ project.title }}</strong>
+      </span>
+      <span *ngIf="!projectNotification(project)" class="normal">
+        {{ project.title }}
+      </span>
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="description">
+    <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
+    <mat-cell *matCellDef="let project">
+      <span *ngIf="project.description">{{ truncateDescription(project.description, 150) }}</span>
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="status">
+    <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
+    <mat-cell *matCellDef="let project"> {{ getProjectStage(project) }} </mat-cell>
+  </ng-container>
+  
+  <ng-container matColumnDef="actions">
+    <mat-header-cell *matHeaderCellDef>  </mat-header-cell>
+    <mat-cell *matCellDef="let project">
+      <button (click)="openProject(project)">Edit</button>
+    </mat-cell> 
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+</mat-table>
+
