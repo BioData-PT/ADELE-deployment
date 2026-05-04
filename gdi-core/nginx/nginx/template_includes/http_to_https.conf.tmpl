@@ -1,0 +1,14 @@
+# redirect any http request to https
+server {
+  listen 80;
+  server_name _;
+
+  # get certbot challenge files from this location
+  location /.well-known/acme-challenge/ {
+    root /var/www/certbot;
+  }
+
+  location / {
+    return 301 https://$host$request_uri;
+  }
+}

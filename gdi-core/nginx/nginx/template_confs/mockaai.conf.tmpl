@@ -1,0 +1,8 @@
+server {
+    server_name {{ env.Getenv "MOCK_AAI_DOMAIN" }};
+    include includes/ssl.conf;
+    
+    location / {
+        proxy_pass http://aai-mock:8080;
+    }
+}

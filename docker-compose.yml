@@ -5,6 +5,7 @@ include:
   - gdi-core/storage/docker-compose.yml
   - gdi-core/funnel-sk/docker-compose.yml
   - gdi-core/rems/docker-compose.yml
+  - gdi-core/mockaai/docker-compose.yml
 
 networks:
   tre-core:

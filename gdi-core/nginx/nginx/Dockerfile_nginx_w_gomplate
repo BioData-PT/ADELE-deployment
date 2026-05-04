@@ -1,0 +1,8 @@
+FROM nginx:latest
+# add gomplate to nginx image, so we can use go templates
+COPY --from=hairyhenderson/gomplate:stable /gomplate /bin/gomplate
+
+# add cron (not needed anymore)
+# RUN apt update
+# RUN apt install -y cron
+

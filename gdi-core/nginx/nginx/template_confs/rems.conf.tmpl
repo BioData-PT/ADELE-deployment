@@ -1,0 +1,10 @@
+server {
+    server_name {{ env.Getenv "REMS_DOMAIN" }};
+    include includes/ssl.conf;
+
+    location / {
+	    proxy_pass http://rems-app:3000;
+    	proxy_set_header Host $host;
+    }
+}
+

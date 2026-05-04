@@ -1,0 +1,16 @@
+# --- generic configuration for ssl, to be included in every ssl server block ---
+
+# If there are no certificates yet, dont use SSL and move everything to 8080 (not connected to the outside)
+# Nginx will need to be restarted (either manually or by the autoreload script) after certbot obtains the 
+# certificates for the first time, to start using SSL
+{{ $cert_path := env.Getenv "CERT_FILE" }}
+{{ if file.Exists $cert_path }}
+listen 443 ssl;
+#ssl_certificate /etc/letsencrypt/live/tre-cert/fullchain.pem;  
+#ssl_certificate_key /etc/letsencrypt/live/tre-cert/privkey.pem;
+ssl_certificate {{ env.Getenv "CERT_FILE" }};  
+ssl_certificate_key {{ env.Getenv "KEY_FILE" }};
+{{ else }}
+# deactivate every SSL server block
+listen 8080;
+{{ end }}

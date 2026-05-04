@@ -1,0 +1,8 @@
+server {
+    server_name {{ env.Getenv "FDP_DOMAIN" }};
+    include includes/ssl.conf;
+    
+    location / {
+        proxy_pass http://fdp-client;
+    }
+}
