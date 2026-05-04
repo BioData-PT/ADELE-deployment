@@ -15,7 +15,14 @@ After that, you'll need to register at 2 different groups using the following UR
 If everything went well, your LS AAI account is now ready to access the TRE!
 
 ## Changes before first start-up
-
+- Execute the following commands to setup the initial environment and configuration files:
+```bash
+cp .env.example .env
+cp ADELE/.env.example ADELE/.env
+cp gdi-core/storage/.env.example gdi-core/storage/.env
+cp gdi-core/storage/config/iss.json.example gdi-core/storage/config/iss.json
+cp gdi-core/storage/config/config.yaml.example gdi-core/storage/config/config.yaml
+```
 - Execute `vim nginx/nginx/confs_docker/*.conf` and comment every https server block (i.e., all that mention port 443). Not doing so will make the nginx container crash because it won't be able to find the certificates in the conf file.
 - Change domains in `nginx/nginx/confs_docker/` files and in `nginx/get_cert.sh` (in the script, you need to have a `-d` before each domain).
 
@@ -23,9 +30,10 @@ If everything went well, your LS AAI account is now ready to access the TRE!
 To run the stack, execute the following commands in the root directory of the repository:
 ```bash
 docker compose up -d db
-docker compose run --rm -e CMD="migrate" app
+docker compose run --rm -e CMD="migrate" rems-app
 docker compose up -d
 ```
+
 If any error pops up, check the logs of the troubled container and look for the configuration in the respective module inside gdi-core.
 
 The first step is to get the configuration running with minimal changes and using a mock OIDC client. The next steps are going to be to set up a real OIDC client and get valid HTTPS certificates and then change your configuration accordingly.
@@ -84,12 +92,12 @@ export REMS_OWNER="<YOUR USERNAME>"
 
 Grant it owner role:
 ```bash
-docker compose exec app java -Drems.config=/rems/config/config.edn -jar rems.jar grant-role owner $REMS_OWNER
+docker compose exec rems-app java -Drems.config=/rems/config/config.edn -jar rems.jar grant-role owner $REMS_OWNER
 ```
 
 Restart the app to load the account as owner:
 ```bash
-docker compose restart app
+docker compose restart rems-app
 ```
 
 #### Create API credentials

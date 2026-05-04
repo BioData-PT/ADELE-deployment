@@ -1,0 +1,48 @@
+# SPDX-FileCopyrightText: 2025 Health-RI
+# 
+# SPDX-License-Identifier: Apache-2.0
+
+---
+schemas:
+  #The FDP shape files are constructed using the files in the PiecesShape folder.
+  Catalog:
+    - "Catalog.ttl"
+  Dataset:
+    - "Dataset.ttl"
+    - "AgentCreator.ttl"
+    - "AgentHdab.ttl"
+    - "Kind.ttl"
+    - "Identifier.ttl"
+  Resource:
+    - "Resource.ttl"
+  Distribution:
+    - "Distribution.ttl"
+  Data Service:
+    - "DataService.ttl"
+# Some schemas are extending the Resource schema.
+parentChild:
+ Resource:
+    - "Dataset"
+    - "Catalog"
+    - "Data Service"
+# the resources for the FDP, note we are using Parent relation instead of Childeren (as the FDP does)
+resources:
+  Data Service:
+    parentResource: "Distribution"
+    parentRelationIri: "http://www.w3.org/ns/adms#sample"
+    schema: "Data Service"
+schemasToPublish:
+  - "Resource"
+  - "Catalog"
+  - "Dataset"
+  - "Distribution"
+  - "Data Service"
+schemaVersion: "2.0.0"
+#Location of the shapes files used for uploading to FDP.
+inputDir: "https://raw.githubusercontent.com/GenomicDataInfrastructure/gdi-metadata/refs/heads/main/Formulasation(shacl)/core/PiecesShape/"
+#for use with the template option, uses Excel template to generate shapes files for uploading to FDP.
+templateDir: ""
+outputRoot: ""
+piecesDir: "PiecesShape"
+fairDataPointDir: "FairDataPointShape"
+validationDir: "ValidationShape"

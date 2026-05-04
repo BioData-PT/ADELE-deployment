@@ -1,0 +1,6 @@
+FROM registry.gitlab.ics.muni.cz:443/perun/deployment/proxyidp/proxyidp-public-docker-images/ls_aai_mock:2.5.2-broker2.1.10-tomcat9.0-jdk11
+# add gomplate to image, so we can use go templates
+COPY --from=hairyhenderson/gomplate:stable /gomplate /bin/gomplate
+
+# load our entrypoint instead of catalina directly
+CMD ["bash", "docker-entrypoint.sh"]

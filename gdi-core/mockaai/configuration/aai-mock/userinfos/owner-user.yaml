@@ -1,0 +1,35 @@
+---
+web-display-name: "Owner user"
+
+sub: "owner.user@example.org"
+
+name: "Owner User"
+preferred-username: "owner.user"
+given-name: "Owner"
+family-name: "User"
+middle-name: ""
+nickname: "OwnerUser"
+locale: "PT"
+
+email: "owner.user@example.org"
+email-verified: True
+
+country: "pt"
+
+eduperson-entitlement: ["urn:geant:lifescience-ri.eu:group:researchers#lifescience-ri.eu"]
+
+voperson-external-affiliation: ["member@tecnico.ulisboa.pt", "student@tecnico.ulisboa.pt", "faculty@tecnico.ulisboa.pt"]
+
+eduperson-orcid: "https://orcid.org/nope-nope-nope-nope"
+
+schac-home-organization: ["tecnico.ulisboa.pt"]
+
+eduperson-scoped-affiliation: ["affiliate@lifescience-ri.eu", "member@lifescience-ri.eu"]
+
+voperson-current-external-affiliation: ["affiliate@faberuni.edu", "faculty@faberuni.edu"]
+
+authenticating-entity: "https://idp.faberuni.edu/shibboleth"
+
+acr: "https://refeds.org/assurance/IAP/high"
+
+authn-instant: "2022-01-01T01:01:01Z"

@@ -1,0 +1,75 @@
+services:
+  aai-mock:
+    environment:
+      - DOCKERHOST=${DOCKERHOST:-localhost}
+      - MOCK_AAI_DOMAIN
+      - STORAGE_AUTH_DOMAIN
+      - REMS_DOMAIN
+      - WEB_DOMAIN
+      - WEB_API_DOMAIN
+      - BACKOFFICE_DOMAIN
+      - BACKOFFICE_API_DOMAIN
+      - CLIENT_ID
+      - CLIENT_SECRET
+      - REMS_CLIENT_ID
+      - REMS_CLIENT_SECRET
+      - REPORTER_USER
+      - REPORTER_APIKEY
+    extra_hosts:
+      - "${DOCKERHOST:-dockerhost}:host-gateway"
+    image: mockaai-template:latest
+    build:
+      context: .
+      dockerfile: ./Dockerfile_mock_w_gomplate
+    #container_name: ls-aai-mock
+    volumes:
+      - "./configuration/aai-mock:/etc/lsaai-mock"
+      - ./docker-entrypoint.sh:/usr/local/tomcat/docker-entrypoint.sh:ro
+    ports:
+      - 127.0.0.1:4888:8080
+    networks:
+      - lsaaimock
+      - tre-core
+
+  aai-db:
+    image: mysql/mysql-server:latest
+    #container_name: ls-aai-db
+    environment:
+      MYSQL_ROOT_PASSWORD: 'aaiPass'
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: 'aai'
+      MYSQL_USER: 'aai'
+      MYSQL_PASSWORD: 'aaiPass'
+    volumes:
+      - "./scripts/aai-mock.sql:/docker-entrypoint-initdb.d/1.sql"
+    # remove this to disable persistent storage
+      - "mysql:/var/lib/mysql"
+    #ports:
+    #  - '3306:3306'
+    networks:
+      - lsaaimock
+      - tre-core
+# Uncomment if you need to write visas into the broker - this is the storage for the broker
+  #broker-db:
+  #  image: mysql/mysql-server:latest
+  #  container_name: ls-broker-db
+  #  environment:
+  #    MYSQL_ROOT_PASSWORD: 'rootPass'
+  #    MYSQL_ROOT_HOST: '%'
+  #    MYSQL_DATABASE: 'broker'
+  #    MYSQL_USER: 'brokerUser'
+  #    MYSQL_PASSWORD: 'brokerPass'
+  #  volumes:
+  #    - "./scripts/ga4gh-broker.sql:/docker-entrypoint-initdb.d/1.sql"
+  #  # remove this to disable persistent storage
+  #    - "./mysql://var/lib/mysql"
+  #  ports:
+  #    - '3307:3306'
+  #  networks:
+  #    - lsaaimock
+
+networks:
+  lsaaimock:
+
+volumes:
+  mysql:

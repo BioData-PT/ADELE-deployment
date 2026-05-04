@@ -1,0 +1,57 @@
+# server {
+#     server_name inbox.adele.inesc-id.pt;
+
+#     listen 443 ssl;  
+#     include includes/ssl.conf;
+
+#     client_max_body_size 50G;
+
+#     location / {
+#         proxy_pass http://s3inbox:8000;
+#     }
+
+#     location /c4gh.pub.pem {
+#         default_type text/plain;
+#         alias /var/www/html/c4gh.pub.pem;
+#     }
+    
+#     #TODO: get a better way to avoid people accessing /debug/vars
+#     location /debug {
+#         proxy_pass http://s3inbox:8000/blabla;
+#     }
+# }
+
+server {
+    server_name {{ env.Getenv "STORAGE_AUTH_DOMAIN" }};
+    
+    include includes/ssl.conf; 
+
+    # NOTE: We need to use a variable for the domain name + dns resolver
+    # because auth service depends on nginx being up in case
+    # it retrieves the OIDC configuration from the mock aai.
+    # If we didn't do this, we would need to have nginx depend on auth, 
+    # which would create a circular dependency.
+
+    # this is the internal Docker DNS, cache for 60s
+    resolver 127.0.0.11 valid=60s;
+
+    location / {
+        set $auth_domain auth;
+        #proxy_pass http://auth:8080;
+        proxy_pass http://$auth_domain:8080;
+    }
+}
+
+# server {
+#     server_name download.adele.inesc-id.pt;
+
+#     listen 443 ssl; 
+#     ssl_certificate /etc/letsencrypt/live/adele-certs/fullchain.pem; 
+#     ssl_certificate_key /etc/letsencrypt/live/adele-certs/privkey.pem; 
+    
+#     location / {
+#         proxy_pass http://download:8443;
+#     }
+# }
+
+

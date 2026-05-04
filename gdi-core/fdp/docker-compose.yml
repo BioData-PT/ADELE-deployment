@@ -1,35 +1,100 @@
 #version: '3'
 services:
 
-     fdp:
-         image: fairdata/fairdatapoint:1.16
-         volumes:
-             - ./application.yml:/fdp/application.yml:ro
+    fdp:
+        image: fairdata/fairdatapoint:1.16
+        volumes:
+            - ./application.yml:/fdp/application.yml:ro
+        restart: unless-stopped
+        healthcheck:
+            test: wget --quiet --spider http://127.0.0.1:80 || exit 1
+            #test: wget --quiet --spider http://127.0.0.1:80 || pkill java && exit 1
+            start_interval: 3s
+            start_period: 3s
+        networks:
+            - default
+            - joint_fdp_website
+        environment:
+            - INSTANCE_CLIENTURL=https://${FDP_DOMAIN}
+            - INSTANCE_PERSISTENTURL=https://${FDP_DOMAIN}
+            - REPOSITORY_TYPE=4
+            - REPOSITORY_GRAPHDB_URL=http://graphdb:7200
+            - REPOSITORY_GRAPHDB_REPOSITORY=fdp
+            - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/fdp # use adele's instance
 
-     fdp-client:
-         image: fairdata/fairdatapoint-client:1.16
-         ports:
-             - 127.0.0.1:8667:80
-         environment:
-             - FDP_HOST=fdp
-         networks:
-             - tre-core
-             - default
+        depends_on:
+            mongodb:
+                condition: service_healthy
+            graphdb-init:
+                condition: service_completed_successfully
 
-     mongo:
-         image: mongo:4.0.12
-         volumes:
-             - data:/data/db
 
-     blazegraph:
-         image: metaphacts/blazegraph-basic:2.2.0-20160908.003514-6
-         #ports:
-         #    - 127.0.0.1:10946:8080
-         volumes:
-             - ./blazegraph:/blazegraph-data
+    fdp-client:
+        image: fairdata/fairdatapoint-client:1.16
+        ports:
+            - 127.0.0.1:8667:80
+        environment:
+            - FDP_HOST=fdp
+        depends_on:
+            fdp:
+                condition: service_healthy
+            mongodb:
+                condition: service_healthy
+            graphdb:
+                condition: service_healthy
+        networks:
+            - tre-core
+            - default
+            - joint_fdp_website
+
+    # removed, now FDP uses the ADELE's website mongodb instance
+    # in joint_fdp_website network
+    # mongo:
+    #     image: mongo:4.0.12
+    #     volumes:
+    #         - mongodbdata:/data/db
+
+    graphdb:
+        image: "ontotext/graphdb:${GRAPHDB_VERSION:-10.8.8}"
+        restart: no
+        ports:
+            - "127.0.0.1:7200:7200"
+        volumes:
+            - graphdbdata:/opt/graphdb/home
+        healthcheck:
+            test: curl http://localhost:7200/rest/monitor/infrastructure --silent --fail || exit 1
+            start_interval: 3s
+            start_period: 30s
+
+    graphdb-init:
+        image: "curlimages/curl:${CURL_VERSION:-latest}"
+        restart: no
+        environment:
+            REPO_FILE: /repo.json
+            REPO_NAMES: fdp
+        volumes:
+            - ./repo.json:/repo.json:ro
+        # the following curl request returns status 201 if the repo does not exist, or status 400 otherwise
+        command:
+            - sh
+            - -c
+            - |
+                for name in $$REPO_NAMES
+                do
+                # substitute "repo-name" by variable name in graphdb repo template
+                data=$$(sed s/repo-name/$$name/g /repo.json)
+                # post repo definition to graphdb rest api
+                curl http://graphdb:7200/rest/repositories --verbose --silent --header "Content-Type: application/json" --data "$$data"
+                done
+        depends_on:
+            graphdb:
+                condition: service_healthy
+
 
 volumes:
-  data:
+  graphdbdata:
+  mongodbdata:
+
 
 #networks:
   #tre-core:
