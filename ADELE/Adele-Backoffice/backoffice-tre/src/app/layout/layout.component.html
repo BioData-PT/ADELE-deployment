@@ -1,0 +1,23 @@
+<div class="content">
+  <!-- Top Header Toolbar -->
+  <mat-toolbar color="primary">
+    <span>Backoffice</span>
+    <span class="spacer"></span>
+    <button mat-button routerLink="/">Dashboard</button>
+    <button mat-button routerLink="/projects"
+      *ngIf="getRole() === 'TRE-OPERATOR' || getRole() === 'ADMIN'">Projects</button>
+    <button mat-button routerLink="/pipelines"
+      *ngIf="getRole() === 'TRE-OPERATOR' || getRole() === 'ADMIN'">Pipelines</button>
+    <button mat-button routerLink="/tasks"
+      *ngIf="getRole() === 'OUTPUT-VALIDATOR' || getRole() === 'ADMIN'">Tasks</button>
+    <button mat-button routerLink="/legal_documents"
+      *ngIf="getRole() === 'TRE-OPERATOR' || getRole() === 'ADMIN'">Legal Documents</button>
+    <button mat-button routerLink="/display-queue-files"
+      *ngIf="getRole() === 'TRE-OPERATOR' || getRole() === 'ADMIN'">Display Queue Files</button>
+      <button mat-button (click)="logout()">Logout</button>
+  </mat-toolbar>
+
+  <div class="main-content">
+    <router-outlet></router-outlet>
+  </div>
+</div>

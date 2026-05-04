@@ -1,0 +1,89 @@
+#version: "3.9"
+services:
+
+  rems-app:
+  #app:
+    #container_name: rems_app
+    image: rems-template:latest
+    build:
+      context: .
+      dockerfile: ./Dockerfile_rems_w_gomplate
+    depends_on:
+      db:
+        condition: service_started
+      jwk-generator:
+        condition: service_completed_successfully
+      aai-mock:
+        condition: service_started
+        
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      #- ./config.edn:/rems/config/config.edn
+      - ./config.tmpl.edn:/rems/config/config.tmpl.edn
+      - ./styles.css:/rems/theme/styles.css
+      - ./theme.edn:/rems/theme/theme.edn
+      - ./en.edn:/rems/theme/extra-translations/en.edn
+      - ./logo_medium.png:/rems/theme/public/img/logo_medium.png
+      - ./logo_small.png:/rems/theme/public/img/logo_small.png
+      - ./ls_login.png:/rems/theme/public/img/ls_login.png
+      - credentials:/rems/keys/ # jwks
+      - ./images/rems-template/docker-entrypoint.sh:/rems/docker-entrypoint.sh:ro
+    networks:
+      - rems-internal
+      - tre-core
+    environment:
+      - REMS_CLIENT_ID
+      - REMS_CLIENT_SECRET
+      - REMS_DOMAIN
+      - AAI_DOMAIN
+      - MOCK_AAI_DOMAIN
+    # entrypoint: "sleep"
+    # command: ["inf"]
+
+  db:
+    #container_name: rems_db
+    image: postgres:13
+    networks:
+      - rems-internal
+    environment:
+      POSTGRES_DB: rems
+      POSTGRES_USER: rems
+      POSTGRES_PASSWORD: remspassword
+        #ports:
+        # - "127.0.0.1:5432:5432"
+
+    # remove this if you don't want a persistent database
+    volumes:
+    - remsdb:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "pg_isready",
+          "-h",
+          "localhost",
+          "-U",
+          "rems"
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  jwk-generator:
+    build: ./images/jwk-generator
+    volumes:
+      - credentials:/app/jwk
+      - ./images/jwk-generator/generate_jwks.py:/app/generate_jwks.py
+      - ./images/jwk-generator/generate_api_key.py:/app/generate_api_key.py
+    #command: "sleep 1000"
+
+networks:
+  rems-internal:
+
+
+volumes:
+  credentials:
+  remsdb:
+    driver: local

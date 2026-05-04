@@ -1,0 +1,11 @@
+[
+    {
+        "iss": "https://{{ env.Getenv "AAI_DOMAIN" }}/oidc/",
+        "jku": "https://{{ env.Getenv "AAI_DOMAIN" }}/oidc/jwk"
+    },
+    {
+        "iss": "https://{{ env.Getenv "REMS_DOMAIN"}}/",
+        "jku": "https://{{ env.Getenv "REMS_DOMAIN"}}/api/jwk"
+    }
+]
+

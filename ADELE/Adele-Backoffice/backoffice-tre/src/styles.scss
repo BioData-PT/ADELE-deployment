@@ -1,0 +1,115 @@
+/* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+:root {
+  --primary-bg: #181c24;
+  --secondary-bg: #232837;
+  --card-bg: #232837;
+  --accent: #4f8cff;
+  --accent-hover: #3570d4;
+  --border: #2c3142;
+  --text-main: #f3f6fa;
+  --text-muted: #a0a7b8;
+  --danger: #e94e1b;
+  --success: #3bb273;
+  --warning: #f9b233;
+  --input-bg: #232837;
+  --input-border: #353a4a;
+}
+
+body {
+  background: var(--primary-bg);
+  color: var(--text-main);
+  font-family: 'Roboto', 'Arial', sans-serif;
+  letter-spacing: 0.01em;
+}
+
+a, .text-primary {
+  color: var(--accent);
+  text-decoration: none;
+  &:hover { color: var(--accent-hover); }
+}
+
+.card, .mat-card, .agreements-card, .project-info, .modal-content {
+  background: var(--card-bg) !important;
+  color: var(--text-main) !important;
+  border-radius: 1rem;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+  border: 1px solid var(--border);
+}
+
+input, textarea, .form-control, .mat-input-element {
+  background: var(--input-bg) !important;
+  color: var(--text-main) !important;
+  border: 1px solid var(--input-border) !important;
+  border-radius: 0.5rem !important;
+}
+
+input:focus, textarea:focus, .form-control:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 2px rgba(79,140,255,0.15);
+}
+
+.btn, .mat-button, .agreements-btn {
+  background: var(--accent);
+  color: #fff !important;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: background 0.2s;
+  &:hover, &:focus { background: var(--accent-hover); }
+}
+
+.btn-success, .agreements-btn.success {
+  background: var(--success) !important;
+  color: #fff !important;
+}
+.btn-danger, .agreements-btn.danger {
+  background: var(--danger) !important;
+  color: #fff !important;
+}
+.btn-warning, .agreements-btn.warning {
+  background: var(--warning) !important;
+  color: #222 !important;
+}
+
+.alert, .mat-snack-bar-container {
+  background: var(--secondary-bg);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+}
+
+.list-group, .mat-list, .agreements-list {
+  background: var(--secondary-bg);
+  border-radius: 0.5rem;
+  .list-group-item, .mat-list-item, .agreements-list-item {
+    background: transparent;
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border);
+    &:last-child { border-bottom: none; }
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  background: var(--secondary-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.mat-toolbar {
+  background: var(--secondary-bg) !important;
+  color: var(--text-main) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+.mat-sidenav {
+  background: var(--secondary-bg) !important;
+  color: var(--text-main) !important;
+}
+
+

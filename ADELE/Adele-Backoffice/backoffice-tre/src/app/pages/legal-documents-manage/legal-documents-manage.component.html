@@ -1,0 +1,36 @@
+<div class="p-4 border rounded bg-white shadow-sm">
+  <h2 class="text-xl font-semibold mb-3">Upload Legal Document</h2>
+  <input type="file" (change)="onFileSelected($event)" accept="application/pdf" class="form-control mb-2" />
+  <button [disabled]="!selectedFile" (click)="upload()" class="btn btn-primary mb-3">Upload</button>
+  <div *ngIf="uploadStatus" class="text-success mb-3">{{ uploadStatus }}</div>
+
+  <hr class="my-4">
+
+  <h3 class="text-lg font-semibold mb-2">Available Legal Document Templates</h3>
+  <div *ngIf="templates?.length; else noTemplates">
+    <div class="row g-3">
+      <div *ngFor="let template of templates" class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body d-flex align-items-center">
+            <img src="assets/img/pdf.png" alt="PDF" width="36" height="36" class="me-3" />
+            <div class="flex-grow-1">
+              <div class="fw-semibold text-truncate" style="max-width: 180px;">
+                <a [href]="getTemplateDownloadUri(template)" target="_blank" class="text-primary text-decoration-underline">
+                  {{ template }}
+                </a>
+              </div>
+              <div class="small text-muted">PDF Document</div>
+            </div>
+            <button (click)="deleteTemplate(template)" class="btn btn-sm btn-outline-danger ms-2" title="Delete">
+              <mat-icon class="mat-18">delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ng-template #noTemplates>
+    <div class="text-muted">No legal document templates available.</div>
+  </ng-template>
+</div>
+

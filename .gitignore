@@ -1,3 +1,8 @@
 .env
+
 .vscode
+
+# angular-generated files
+ADELE/Adele-Website/TRE-BIODATA/dist/
+**/.angular/cache/
 

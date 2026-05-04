@@ -1,0 +1,103 @@
+<div class="container py-4">
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <h2 class="h5 mb-3 text-primary">Uploaded Files</h2>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th>
+              <th>Filename</th>
+              <th>User</th>
+              <th>Upload Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let file of files">
+              <td><code>{{ file.file_id }}</code></td>
+              <td>{{ file.filename }}</td>
+              <td>{{ file.user }}</td>
+              <td>
+                <span *ngIf="file.upload_time">{{ file.upload_time | date:'medium' }}</span>
+                <span *ngIf="!file.upload_time" class="text-muted">Unknown</span>
+              </td>
+              <td *ngIf="!file.archived || file.archived == false">
+                <button class="btn btn-outline-primary btn-sm" (click)="showFileForm(file)">
+                  <i class="bi bi-box-arrow-in-down"></i> Ingest
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div *ngIf="files.length === 0" class="text-center text-muted py-4">
+          <i class="bi bi-file-earmark-x" style="font-size:2rem;"></i>
+          <div>No files uploaded yet.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- File form modal/section -->
+  <div *ngIf="selectedFile" class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,0.2);">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title">Ingest File</h5>
+          <button type="button" class="btn-close btn-close-white" (click)="selectedFile = ''"></button>
+        </div>
+        <form (ngSubmit)="submitFileForm()">
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Filename:</label>
+                <input type="text" class="form-control form-control-lg" [(ngModel)]="selectedFile" name="filename" readonly>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">File ID (Official Filename):</label>
+                <input type="text" class="form-control form-control-lg font-monospace" [value]="selectedFileId" readonly>
+                <small class="text-muted">This is the official filename to be submitted.</small>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Unique ID:</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light font-monospace">{{ uniqueIdPrefix }}</span>
+                  <input type="text" class="form-control form-control-lg font-monospace" [formControl]="fileForm.controls['unique_id_suffix']" required>
+                </div>
+                <div *ngIf="fileForm.controls['unique_id_suffix'].invalid && fileForm.controls['unique_id_suffix'].touched" class="text-danger small">
+                  Please enter the unique ID suffix.
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Dataset ID:</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light font-monospace">{{ datasetIdPrefix }}</span>
+                  <input type="text" class="form-control form-control-lg font-monospace" [formControl]="fileForm.controls['dataset_id_suffix']" required>
+                </div>
+                <div *ngIf="fileForm.controls['dataset_id_suffix'].invalid && fileForm.controls['dataset_id_suffix'].touched" class="text-danger small">
+                  Please enter the dataset ID suffix.
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">REMS Catalogue ID:</label>
+                <div class="input-group">
+                  <input type="text" class="form-control form-control-lg font-monospace" [formControl]="fileForm.controls['rems_catalogue_id']" required>
+                </div>
+                <div *ngIf="fileForm.controls['rems_catalogue_id'].invalid && fileForm.controls['rems_catalogue_id'].touched" class="text-danger small">
+                  Please enter the REMS Catalogue ID.
+                </div>
+                <small class="text-muted">This ID should match the name of the dataset in the Metadata Catalogue.</small>
+              </div>
+          </div>
+          <div class="modal-footer bg-light">
+            <button type="submit" class="btn btn-success">Submit</button>
+            <button type="button" class="btn btn-secondary" (click)="selectedFile = ''">Cancel</button>
+          </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+

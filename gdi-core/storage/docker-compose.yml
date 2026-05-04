@@ -1,0 +1,373 @@
+# Services auth, download and s3inbox in this file will try to connect to the ls-aai-mock service.
+# Remember to start the later while this stack is being deployed. See documentation for more details.
+
+services:
+  credentials:
+    container_name: credentials
+    command:
+      - "/bin/sh"
+      - "/scripts/make_credentials.sh"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      - PGPASSWORD=${credentials_PGPASSWORD}
+    env_file:
+      - ../../.env
+    image: python:3.10-slim
+    networks:
+      - secure
+    volumes:
+      - ./scripts:/scripts
+      - shared:/shared
+      - cacert:/cacert
+
+  auth:
+    #container_name: auth
+    command: sda-auth
+    image: ghcr.io/neicnordic/sensitive-data-archive:v0.3.25
+    depends_on:
+      credentials:
+        condition: service_completed_successfully
+      nginx:
+        condition: service_started
+    environment:
+      - OIDC_ID=${auth_ELIXIR_ID}
+      #- OIDC_PROVIDER=http://${DOCKERHOST:-localhost}:8080/oidc/ #orig
+      #- OIDC_PROVIDER=https://login.aai.lifescience-ri.eu/oidc/
+      - OIDC_PROVIDER=$OIDC_PROVIDER
+      - OIDC_SECRET=${auth_ELIXIR_SECRET}
+      - OIDC_JWKPATH=jwk
+      #- OIDC_REDIRECTURL=http://localhost:8085/oidc/login
+      - OIDC_REDIRECTURL=$OIDC_REDIRECTURL
+      - LOG_LEVEL=debug
+      - RESIGNJWT=false
+    extra_hosts:
+      - ${DOCKERHOST:-localhost}:host-gateway
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - shared:/shared
+      - ${CONFIG_FILEPATH}:/config.yaml
+    ports:
+      - 8085:8080
+    networks:
+      - tre-core
+    restart: always
+
+
+  rabbitmq:
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_PASS=${rabbitmq_MQ_PASSWORD}
+      - RABBITMQ_DEFAULT_USER=${rabbitmq_MQ_USER}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "sh",
+          "-c",
+          "rabbitmq-diagnostics -q check_running && rabbitmq-diagnostics -q check_local_alarms"
+        ]
+      interval: 5s
+      timeout: 20s
+      retries: 20
+    image: ghcr.io/neicnordic/sensitive-data-archive:v0.3.25-rabbitmq
+    networks:
+      - secure
+    restart: always
+    ports:
+      - 15672:15672
+    
+
+  postgres:
+    container_name: postgres
+    environment:
+      - POSTGRES_PASSWORD=${postgres_POSTGRES_PASSWORD}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "pg_isready",
+          "-h",
+          "localhost",
+          "-U",
+          "postgres"
+        ]
+      interval: 5s
+      timeout: 20s
+      retries: 20
+    image: ghcr.io/neicnordic/sensitive-data-archive:v0.3.25-postgres
+    networks:
+      - secure
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  s3:
+    command: server /data  --console-address ":9001"
+    container_name: s3
+    environment:
+      - MINIO_ROOT_USER=${s3_MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${s3_MINIO_ROOT_PASSWORD}
+      - MINIO_SERVER_URL=${s3_MINIO_SERVER_URL}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-fq",
+          "http://localhost:9000/minio/health/live"
+        ]
+      interval: 5s
+      timeout: 20s
+      retries: 3
+    image: minio/minio:RELEASE.2023-10-25T06-33-25Z
+    networks:
+      - secure
+      - tre-core
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+    restart: always
+    volumes:
+      - s3data:/data
+
+  ## data ingest pipeline
+  download:
+    
+    #command: sda-download
+    command: ["/docker-entrypoint.sh"]
+    #container_name: download
+    #image: harbor.nbis.se/gdi/sda-download:20240415
+    image: sda-download-template:latest
+    build:
+      context: .
+      dockerfile: Dockerfile_sdadownload_w_gomplate
+    depends_on:
+      credentials:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      s3:
+        condition: service_healthy
+      nginx:
+        condition: service_started
+    environment:
+      - DB_PASSWORD=${download_DB_PASSWORD}
+      - DB_USER=${download_DB_USER}
+        #- OIDC_CONFIGURATION_URL=http://${DOCKERHOST:-dockerhost}:8080/oidc/.well-known/openid-configuration
+      #- OIDC_CONFIGURATION_URL=https://login.aai.lifescience-ri.eu/oidc/.well-known/openid-configuration
+      - OIDC_CONFIGURATION_URL=$OIDC_CONFIGURATION_URL
+      - ARCHIVE_TYPE=s3seekable
+      - REMS_DOMAIN
+      - AAI_DOMAIN
+    extra_hosts:
+      - ${DOCKERHOST:-dockerhost}:host-gateway
+    networks:
+      - public
+      - secure
+      - tre-core
+    ports:
+      - 8443:8443
+    restart: always
+    volumes:
+      - ${CONFIG_FILEPATH}:/config.yaml
+      #- ${ISS_FILEPATH}:/iss.json
+      - ./config/iss.json.tmpl:/iss.json.tmpl
+      - ./docker-entrypoint-sdadownload.sh:/docker-entrypoint.sh
+      - shared:/shared
+
+  finalize:
+    command: sda-finalize
+    container_name: finalize
+    depends_on:
+      credentials:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      s3:
+        condition: service_healthy
+    environment:
+      - BROKER_PASSWORD=${finalize_BROKER_PASSWORD}
+      - BROKER_QUEUE=${finalize_BROKER_QUEUE}
+      - BROKER_ROUTINGKEY=${finalize_BROKER_ROUTINGKEY}
+      - BROKER_USER=${finalize_BROKER_USER}
+      - DB_PASSWORD=${finalize_DB_PASSWORD}
+      - DB_USER=${finalize_DB_USER}
+    image: ghcr.io/neicnordic/sensitive-data-archive:v0.3.25
+    networks:
+      - secure
+    restart: always
+    volumes:
+      - ${CONFIG_FILEPATH}:/config.yaml
+
+  ingest:
+    command: sda-ingest
+    container_name: ingest
+    depends_on:
+      credentials:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      s3:
+        condition: service_healthy
+    environment:
+      - BROKER_PASSWORD=${ingest_BROKER_PASSWORD}
+      - BROKER_QUEUE=${ingest_BROKER_QUEUE}
+      - BROKER_ROUTINGKEY=${ingest_BROKER_ROUTINGKEY}
+      - BROKER_USER=${ingest_BROKER_USER}
+      - DB_PASSWORD=${ingest_DB_PASSWORD}
+      - DB_USER=${ingest_DB_USER}
+    image: ghcr.io/neicnordic/sensitive-data-archive:v0.3.25
+    networks:
+      - secure
+    restart: always
+    volumes:
+      - ${CONFIG_FILEPATH}:/config.yaml
+      - shared:/shared
+
+  mapper:
+    command: sda-mapper
+    container_name: mapper
+    depends_on:
+      credentials:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      s3:
+        condition: service_healthy
+    environment:
+      - BROKER_PASSWORD=${mapper_BROKER_PASSWORD}
+      - BROKER_QUEUE=${mapper_BROKER_QUEUE}
+      - BROKER_USER=${mapper_BROKER_USER}
+      - DB_PASSWORD=${mapper_DB_PASSWORD}
+      - DB_USER=${mapper_DB_USER}
+    image: ghcr.io/neicnordic/sensitive-data-archive:v0.3.25
+    networks:
+      - secure
+    restart: always
+    volumes:
+      - ${CONFIG_FILEPATH}:/config.yaml
+
+  verify:
+    command: sda-verify
+    container_name: verify
+    depends_on:
+      credentials:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      s3:
+        condition: service_healthy
+    environment:
+      - BROKER_PASSWORD=${verify_BROKER_PASSWORD}
+      - BROKER_QUEUE=${verify_BROKER_QUEUE}
+      - BROKER_ROUTINGKEY=${verify_BROKER_ROUTINGKEY}
+      - BROKER_USER=${verify_BROKER_USER}
+      - DB_PASSWORD=${verify_DB_PASSWORD}
+      - DB_USER=${verify_DB_USER}
+    image: ghcr.io/neicnordic/sensitive-data-archive:v0.3.25
+    networks:
+      - secure
+    restart: always
+    volumes:
+      - ${CONFIG_FILEPATH}:/config.yaml
+      - shared:/shared
+
+  s3inbox:
+    command: sda-s3inbox
+    container_name: s3inbox
+    depends_on:
+      credentials:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      s3:
+        condition: service_healthy
+      nginx:
+        condition: service_started
+    environment:
+      - BROKER_PASSWORD=${inbox_BROKER_PASSWORD}
+      - BROKER_ROUTINGKEY=${inbox_BROKER_ROUTINGKEY}
+      - BROKER_USER=${inbox_BROKER_USER}
+      - DB_PASSWORD=${inbox_DB_PASSWORD}
+      - DB_USER=${inbox_DB_USER}
+      #- SERVER_JWTPUBKEYURL=http://${DOCKERHOST:-dockerhost}:8080/oidc/jwk
+      - SERVER_JWTPUBKEYURL=$SERVER_JWTPUBKEYURL
+    extra_hosts:
+      - ${DOCKERHOST:-dockerhost}:host-gateway
+    image: ghcr.io/neicnordic/sensitive-data-archive:v0.3.25
+    networks:
+      - public
+      - secure
+      - tre-core
+    ports:
+      - "8000:8000"
+    restart: always
+    volumes:
+      - ${CONFIG_FILEPATH}:/config.yaml
+      - shared:/shared
+
+  reencrypt:
+    command: sda-reencrypt
+    container_name: reencrypt
+    depends_on:
+      credentials:
+        condition: service_completed_successfully
+    image: ghcr.io/neicnordic/sensitive-data-archive:v0.3.25
+    networks:
+      - secure
+    restart: always
+    volumes:
+      - ${CONFIG_FILEPATH}:/config.yaml
+      - shared:/shared
+      - cacert:/cacert
+  sda-api:
+    #container_name: sda-api
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    depends_on:
+      credentials:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      s3:
+        condition: service_healthy
+    environment:
+      - MQ_URL=rabbitmq:15672
+    networks:
+      - secure
+      - tre-core
+    ports:
+      - "127.0.0.1:5100:5100"
+    restart: always
+    volumes:
+      - ./s3cmd.conf:/s3cmd.conf
+      - ./scripts/sda-admin:/scripts/sda-admin
+
+volumes:
+  cacert:
+  pgdata:
+  shared:
+  s3data:
+
+networks:
+  public:
+  secure:
+  #tre-core:
+    #  external: True

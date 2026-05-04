@@ -1,0 +1,267 @@
+<div class="container-fluid py-5" *ngIf="project.status== 'M-E'">
+  <h2 class="mb-1">Dataset Metadata Entry</h2>
+  <p class="text-muted mb-4">Fill in dataset details and add up to 10 related distributions.</p>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm mb-5">
+        <div class="card-body">
+          <h4 class="card-title mb-4">Dataset Details</h4>
+          <form [formGroup]="datasetForm">
+            <!-- General Info -->
+            <div class="mb-4">
+              <h5 class="mb-3 border-bottom pb-2">General Information</h5>
+              <div class="row g-3">
+                <div>
+                  <label class="form-label">Title <span class="text-danger">*</span></label>
+                  <input formControlName="title" class="form-control" required />
+                  <small class="text-muted">Name of the dataset.</small>
+                  <small *ngIf="isInvalid(datasetForm, 'title')" class="text-danger">Title is required.</small>
+                </div>
+                <div>
+                  <label class="form-label">Version <span class="text-danger">*</span></label>
+                  <input formControlName="version" class="form-control" required />
+                  <small class="text-muted">Dataset version (e.g., 1.0).</small>
+                  <small *ngIf="isInvalid(datasetForm, 'version')" class="text-danger">Version is required.</small>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Description <span class="text-danger">*</span></label>
+                  <textarea formControlName="description" class="form-control" rows="3" required></textarea>
+                  <small *ngIf="isInvalid(datasetForm, 'description')" class="text-danger">Description is
+                    required.</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Theme Info -->
+            <div class="mb-4">
+              <h5 class="mb-3 border-bottom pb-2">Theme</h5>
+              <div class="row g-3">
+                <div class="col-md-8">
+                  <label class="form-label">Theme URI <span class="text-danger">*</span></label>
+                  <input formControlName="theme_uri" class="form-control" required (blur)="fetchSkosLabel()" />
+                  <small class="text-muted">Link to dataset's theme/category from a controlled vocabulary. Use the URI
+                    from the <a href="https://op.europa.eu/en/web/eu-vocabularies/" target="_blank">EU
+                      Vocabularies.</a></small>
+                  <small class="text-muted">
+                    <p><b>Please, in the filter column, select the results only by the schema EuroSciVoc.</b></p>
+                  </small>
+                  <small *ngIf="isInvalid(datasetForm, 'theme_uri')" class="text-danger">Theme is required.</small>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Theme Label (auto-filled) <span class="text-danger">*</span></label>
+                  <input formControlName="theme_label" class="form-control bg-light fst-italic" readonly />
+                  <small class="text-muted">Human-readable label for the theme (e.g., Health).</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Publisher Info -->
+            <div class="mb-4">
+              <h5 class="mb-3 border-bottom pb-2">Publisher</h5>
+              <div class="row g-3">
+
+                <div class="col-md-8">
+                  <label class="form-label">Publisher Identifier <span class="text-danger">*</span></label>
+                  <input formControlName="publisher_identifier" class="form-control" required
+                    (blur)="getContactInfoFromBackend(datasetForm, 'publisher_identifier')" />
+                  <small class="text-muted">Unique identifier for the publisher from <a href="https://ror.org/"
+                      target="_blank">ROR</a>.</small>
+                  <small *ngIf="isInvalid(datasetForm, 'publisher_identifier')" class="text-danger">Publisher identifier
+                    is required.</small>
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label">Publisher Name <span class="text-danger">*</span></label>
+                  <input formControlName="publisher_name" class="form-control bg-light fst-italic" readonly />
+                  <small class="text-muted">Person or organization responsible for publishing the dataset.</small>
+                  <small *ngIf="isInvalid(datasetForm, 'publisher_name')" class="text-danger">Publisher is
+                    required.</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="mb-4">
+              <h5 class="mb-3 border-bottom pb-2">Contact Information</h5>
+              <div class="row g-3">
+
+
+                <div class="col-md-8">
+                  <label class="form-label">Contact UID</label>
+                  <input formControlName="contact_uid" class="form-control"
+                    (blur)="getContactInfoFromBackend(datasetForm, 'contact_uid')" />
+                  <small class="text-muted">Unique identifier for the contact from <a href="https://orcid.org/"
+                      target="_blank">ORCID</a>.</small>
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label">Contact Name <span class="text-danger">*</span></label>
+                  <input formControlName="contact_name" class="form-control bg-light fst-italic" readonly />
+                  <small class="text-muted">Name of the contact person.</small>
+                  <div *ngIf="isInvalid(datasetForm, 'contact_name')" class="text-danger">Contact name is required.
+                  </div>
+                </div>
+
+              </div>
+              <div class="row g-3">
+                <div>
+                  <label class="form-label">Contact Email <span class="text-danger">*</span></label>
+                  <input formControlName="contact_email" class="form-control" required />
+                  <small class="text-muted">Contact email for dataset questions.</small>
+                  <div *ngIf="isInvalid(datasetForm, 'contact_email')" class="text-danger">Contact email is required.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <!-- Dates & License -->
+            <div class="mb-4">
+              <h5 class="mb-3 border-bottom pb-2">Dates & License</h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Issued Date <span class="text-danger">*</span></label>
+                  <input type="date" formControlName="issued_date" class="form-control" required />
+                  <small class="text-muted">Date the dataset was first published.</small>
+                  <div *ngIf="isInvalid(datasetForm, 'issued_date')" class="text-danger">Issued date is required.</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Modified Date</label>
+                  <input type="date" formControlName="modified_date" class="form-control" />
+                  <small class="text-muted">Date of last dataset update.</small>
+                </div>
+              </div>
+              <div class="row g-3">
+                <div>
+                  <label class="form-label">License URL <span class="text-danger">*</span></label>
+                  <input formControlName="license" class="form-control" required />
+                  <small class="text-muted">Legal terms for using the data. (<a
+                      href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>).</small>
+                  <div *ngIf="isInvalid(datasetForm, 'license')" class="text-danger">License is required.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Keywords -->
+            <div class="mb-4">
+              <h5 class="mb-3 border-bottom pb-2">Keywords</h5>
+              <input formControlName="keywords" class="form-control" />
+              <small class="text-muted">Keywords describing the dataset (comma-separated).</small>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Distributions -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>Distributions</h4>
+        <button class="btn btn-outline-primary" (click)="addDistribution()"
+          [disabled]="distributionsForms.length >= 10">
+          + Add Distribution ({{ distributionsForms.length }}/10)
+        </button>
+      </div>
+
+      <div *ngFor="let distForm of distributionsForms; let i = index" [formGroup]="distForm"
+        class="card shadow-sm mb-4">
+        <div class="card-body">
+          <ng-container *ngIf="!distForm.get('collapsed')?.value">
+            <h5 class="mb-3">Distribution {{ i + 1 }}</h5>
+            <div class="row g-3">
+              <div>
+                <label class="form-label">Title</label>
+                <input formControlName="title" class="form-control" />
+                <small class="text-muted">Name of the distribution (e.g., CSV version).</small>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Media Type <span class="text-danger">*</span></label>
+                <input formControlName="media_type" class="form-control" required />
+                <small class="text-muted">MIME type of the file (e.g., text/csv).</small>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Version</label>
+                <input formControlName="version" class="form-control" />
+                <small class="text-muted">Version of the distribution file.</small>
+              </div>
+              <div class="col-md-8">
+                <label class="form-label">Publisher Identifier</label>
+                <input formControlName="publisher_identifier" class="form-control"
+                  (blur)="getContactInfoFromBackend(distributionForm, 'publisher_identifier')" />
+                <small class="text-muted">Unique identifier for the publisher from <a href="https://ror.org/"
+                    target="_blank">ROR</a>.</small>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Publisher Name</label>
+                <input formControlName="publisher_name" class="form-control bg-light fst-italic" readonly />
+                <small class="text-muted">Organization or person publishing the distribution</small>
+              </div>
+
+              <div>
+                <label class="form-label">Description</label>
+                <textarea formControlName="description" class="form-control" rows="3"></textarea>
+                <small class="text-muted">Explain what this distribution contains.</small>
+              </div>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-3">
+              <button class="btn btn-sm btn-success" (click)="saveDistribution(i)">Save</button>
+              <button class="btn btn-sm btn-outline-danger" (click)="removeDistribution(i)">Remove</button>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="d-flex justify-content-end mt-4">
+        <button class="btn btn-success px-4" (click)="submitMetadata()">
+          Submit Metadata
+        </button>
+      </div>
+      <div *ngIf="!datasetForm.valid || distributionsData.length === 0" class="text-danger mt-2 text-end">
+        Please complete the dataset form and add at least one distribution.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="project.status == 'M-AR'">
+  <div class="container-fluid py-5">
+    <h1>Metadata Submitted</h1>
+    <div class="row">
+      <div class="col-lg-10 col-xl-8 mx-auto">
+        <div class="card shadow-lg">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+              <mat-icon class="me-2">description</mat-icon>
+              Metadata Submission
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-info d-flex align-items-center">
+              <mat-icon class="me-2">info</mat-icon>
+              <span>Your dataset metadata is currently under review. You will be notified once the review is
+                complete.</span>
+            </div>
+            <div class="mb-4">
+              <strong><mat-icon class="me-2">link</mat-icon> Dataset Information</strong>
+              <p><a href="{{project.dataset_uri}}" target="_blank" rel="noopener">
+                  {{project.dataset_uri}}
+                </a></p>
+            </div>
+
+            <div class="mb-4">
+              <strong><mat-icon class="me-2">hourglass_top</mat-icon> Status:</strong>
+              <span class="badge bg-warning text-dark">Under Review</span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center mt-4">
+    <button class="btn btn-outline-danger">
+      <mat-icon class="me-1">support_agent</mat-icon> Contact Administrator
+    </button>
+  </div>
+</div>

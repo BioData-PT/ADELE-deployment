@@ -1,0 +1,91 @@
+<div class="project-details-container">
+    <h1>Project Journey</h1>
+  
+    <!-- Horizontal Timeline -->
+    <div class="journey-timeline">
+      <div *ngFor="let phase of phases; let i = index" 
+           class="timeline-step"
+           [class.completed]="i < currentPhaseIndex"
+           [class.active]="i === currentPhaseIndex"
+           [class.rejected]="phase.status === 'Rejected'">
+  
+        <div class="step-marker"></div>
+        <div class="step-info">
+          <h2>{{ phase.name }}</h2>
+          <p>Status: {{ phase.status }}</p>
+          <p *ngIf="phase.status === 'Rejected'" class="rejection-message">This phase has been rejected.</p>
+        </div>
+      </div>
+    </div>
+  
+    <hr>
+  
+    <!-- Project Details -->
+    <table class="project-info-table">
+      <thead>
+        <tr>
+          <th colspan="2" class="table-title">Project Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Project ID:</strong></td>
+          <td>{{ project.id }}</td>
+        </tr>
+        <tr>
+          <td><strong>Title:</strong></td>
+          <td>{{ project.title }}</td>
+        </tr>
+        <tr>
+          <td><strong>Description:</strong></td>
+          <td>{{ project.description }}</td>
+        </tr>
+        <tr>
+          <td><strong>Validation Date:</strong></td>
+          <td>{{ project.expiration_date }}</td>
+        </tr>
+        <tr>
+          <td><strong>Organization:</strong></td>
+          <td>{{ project.organization }}</td>
+        </tr>
+        <tr>
+          <td><strong>Responsible:</strong></td>
+          <td>{{ project.responsable || 'N/A' }}</td>
+        </tr>
+        <tr>
+          <td><strong>Last Update:</strong></td>
+          <td>{{ project.last_update }}</td>
+        </tr>
+        <tr>
+          <td><strong>Owner:</strong></td>
+          <td>{{ project.owner }}</td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <hr>
+    <!-- Legal Agreement Documents -->
+    <app-agreements-fragment [project]="project" *ngIf="this.currentPhaseIndex > 0"></app-agreements-fragment>
+
+     <!-- Metadata Documents -->
+    <app-metadata-fragment [project]="project" *ngIf="this.currentPhaseIndex > 1"></app-metadata-fragment>
+
+
+    <!-- Data Upload Section -->
+
+    <app-data-upload-fragment [project]="project" *ngIf="this.currentPhaseIndex > 2 && project.files"></app-data-upload-fragment>
+
+    <!-- Validation Buttons -->
+    <div class="validation-actions" *ngIf="canValidateCurrentStep()">
+      <button class="validate-btn" (click)="validateCurrentStep()">
+        <mat-icon>check_circle</mat-icon>Validate Step
+      </button>
+      <button class="reject-btn" (click)="rejectCurrentStep()">
+        <mat-icon>cancel</mat-icon>Reject Step
+      </button>
+    </div>
+    <div *ngIf="!canValidateCurrentStep()" class="text-muted mt-3" style="text-align:center;">
+      <mat-icon>info</mat-icon>
+      Validation actions are only available when the current phase is awaiting review and all required information is complete.
+    </div>
+  </div>

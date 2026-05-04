@@ -1,0 +1,58 @@
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+# ------------------- PORTS -------------------
+BACKOFFICE_FRONTEND_PORT = os.getenv("BACKOFFICE_FRONTEND_PORT")
+BACKOFFICE_BACKEND_PORT = os.getenv("BACKOFFICE_BACKEND_PORT")
+WEBSITE_FRONTEND_PORT = os.getenv("WEBSITE_FRONTEND_PORT")
+WEBSITE_BACKEND_PORT = os.getenv("WEBSITE_BACKEND_PORT")
+
+# ------------------- URLS -------------------
+MONGO_URI = os.getenv("MONGO_URI")
+
+BACKOFFICE_FRONTEND_URL = os.getenv("BACKOFFICE_FRONTEND_URL")
+BACKOFFICE_BACKEND_URL = os.getenv("BACKOFFICE_BACKEND_URL")
+BACKOFFICE_BACKEND_URL_PUBLIC = os.getenv("BACKOFFICE_BACKEND_URL_PUBLIC")
+BACKOFFICE_FRONTEND_URL_PUBLIC = os.getenv("BACKOFFICE_FRONTEND_URL_PUBLIC")
+
+WEBSITE_FRONTEND_URL = os.getenv("WEBSITE_FRONTEND_URL")
+WEBSITE_BACKEND_URL = os.getenv("WEBSITE_BACKEND_URL")
+WEBSITE_BACKEND_URL_PUBLIC = os.getenv("WEBSITE_BACKEND_URL_PUBLIC")
+WEBSITE_FRONTEND_URL_PUBLIC = os.getenv("WEBSITE_FRONTEND_URL_PUBLIC")
+
+MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT")
+MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY")
+MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY")
+
+FUNNEL_URI = os.getenv("FUNNEL_URI")
+
+SI_API_URI = os.getenv("SI_API_URI")
+
+REMS_API = os.getenv("REMS_API")
+
+FDP_URI = os.getenv("FDP_URI")
+FDP_TRE_CATALOG_URI = os.getenv("FDP_TRE_CATALOG_URI")
+
+REDIRECT_URI = os.getenv("REDIRECT_URI")
+LOGIN_URI = os.getenv("LOGIN_URI")
+AUTHORIZATION_URI = os.getenv("AUTHORIZATION_URI")
+USER_INFO_URI = os.getenv("USER_INFO_URI")
+
+DOWNLOAD_S3 = os.getenv("DOWNLOAD_S3")
+
+# ------------------- MAILGUN -------------------
+MAILGUN_URI = os.getenv("MAILGUN_URI")
+MAILGUN_API_KEY = os.getenv("MAILGUN_API_KEY")
+
+# ------------------- KEYS -------------------
+SESSION_SECRET_KEY = os.getenv("SESSION_SECRET_KEY")
+REMS_API_KEY = os.getenv("REMS_API_KEY")
+REMS_USER_ID = os.getenv("REMS_USER_ID")
+
+# ------------------- SECRETS -------------------
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+
+FDP_ADMIN_USERNAME = os.getenv("FDP_ADMIN_USERNAME")
+FDP_ADMIN_PASSWORD = os.getenv("FDP_ADMIN_PASSWORD")

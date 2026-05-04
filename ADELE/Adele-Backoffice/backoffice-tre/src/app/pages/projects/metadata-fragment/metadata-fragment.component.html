@@ -1,0 +1,46 @@
+<div class="metadata-fragment-container p-3">
+  <h4 class="mb-3">Metadata in FDP</h4>
+
+  <ng-container *ngIf="project.status === 'M-E'; else submittedBlock">
+    <div class="alert alert-warning d-flex align-items-center">
+      <i class="bi bi-exclamation-circle me-2"></i>
+      Metadata has <strong class="mx-1">not been submitted</strong> yet by the user.
+      <span *ngIf="project.lastUpdate" class="ms-2 text-muted small">
+        Last update: {{ project.lastUpdate | date:'medium' }}
+      </span>
+    </div>
+  </ng-container>
+
+  <ng-template #submittedBlock>
+
+    <table class="table">
+      <tbody>
+      <tr *ngIf="project.dataset_uri">
+        <td><strong>Dataset URI</strong></td>
+        <td>
+        <i class="bi bi-link-45deg me-2 text-primary"></i>
+        <a [href]="project.dataset_uri" target="_blank" rel="noopener" class="text-primary text-decoration-underline">
+          {{ project.dataset_uri }}
+        </a>
+        </td>
+      </tr>
+      <tr *ngFor="let dist of project.distributions_uri">
+        <td><strong>Distribution URI</strong></td>
+        <td>
+        <i class="bi bi-link-45deg me-2 text-primary"></i>
+        <a [href]="dist" target="_blank" rel="noopener" class="text-primary text-decoration-underline">
+          {{ dist }}
+        </a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <ng-container *ngIf="!project.dataset_uri && !project.distributions_uri.length">
+      <div class="alert alert-info mt-3">
+        No FDP metadata links available for this project.
+      </div>
+    </ng-container>
+  </ng-template>
+</div>
+

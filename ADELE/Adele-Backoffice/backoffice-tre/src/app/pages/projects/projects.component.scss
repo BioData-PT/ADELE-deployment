@@ -1,0 +1,82 @@
+:host {
+  display: block;
+  padding: 2rem 0;
+}
+
+h2 {
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 2rem;
+  letter-spacing: 0.01em;
+}
+
+.mat-table {
+  background: var(--card-bg);
+  color: var(--text-main);
+  border-radius: 1rem;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.13);
+  overflow: hidden;
+  font-size: 1.08em;
+}
+
+.mat-header-row, .mat-row {
+  min-height: 56px;
+}
+
+.mat-header-cell {
+  background: var(--secondary-bg);
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 1.07em;
+  border-bottom: 2px solid var(--border);
+  letter-spacing: 0.01em;
+}
+
+.mat-cell {
+  background: transparent;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--border);
+  font-size: 1em;
+  vertical-align: middle;
+}
+
+.mat-row:last-child .mat-cell {
+  border-bottom: none;
+}
+
+.highlight {
+  color: var(--danger);
+  background: rgba(233, 78, 27, 0.08);
+  padding: 0.15em 0.5em;
+  border-radius: 0.4em;
+}
+
+.normal {
+  color: var(--text-main);
+}
+
+button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 0.4em;
+  padding: 0.35em 1.1em;
+  font-weight: 500;
+  font-size: 1em;
+  transition: background 0.18s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  cursor: pointer;
+  &:hover, &:focus {
+    background: var(--accent-hover);
+    outline: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .mat-table {
+    font-size: 0.97em;
+  }
+  h2 {
+    font-size: 1.3em;
+  }
+}
