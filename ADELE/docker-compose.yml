@@ -6,8 +6,12 @@ services:
     restart: always
     #ports:
     #  - "127.0.0.1:27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD
+      - MONGO_INITDB_DATABASE
     volumes:
-      #- ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
       - adele_mongo_data:/data/db
     healthcheck:
       test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
@@ -18,6 +22,18 @@ services:
     networks:
       - backend_db
       - joint_fdp_website
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    ports:
+      - "127.0.0.1:2081:8081"
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/
+    depends_on:
+      - mongodb
+    networks:
+      - backend_db
 
   adele-backoffice-frontend:
     build:
