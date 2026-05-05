@@ -7,8 +7,3 @@ spring:
     data:
         mongodb:
             uri: mongodb://mongodb:27017/fdp
-
-
-instance:
-    clientUrl: https://fdp.tre-test.biodata.ptsad
-    persistentUrl: https://fdp.tre-test.biodata.ptasd
