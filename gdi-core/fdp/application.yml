@@ -2,8 +2,3 @@
 ping:
     enabled: false
 
-# use adele's mongodb
-spring:
-    data:
-        mongodb:
-            uri: mongodb://mongodb:27017/fdp
