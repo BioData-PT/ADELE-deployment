@@ -7,7 +7,7 @@ services:
     image: rems-template:latest
     build:
       context: .
-      dockerfile: ./Dockerfile_rems_w_gomplate
+      dockerfile: images/rems-template/Dockerfile_rems_w_gomplate
     depends_on:
       db:
         condition: service_started
