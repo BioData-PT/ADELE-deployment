@@ -1,11 +1,11 @@
 # NEED TO SET THE BELOW VARIABLES
 # REMS_OWNER : ID of owner user
-# OWNER_KEY : API key of the owner
-# ORG_OWNER_KEY : String of the to-be API key
-# ORG_OWNER_USER : user id for the robot user
+# REMS_OWNER_KEY : API key of the owner
+# REMS_API_KEY : String of the to-be API key for the org owner
+# REMS_USER_ID : user id for the robot org owner user
 # USER_DESC : description of the robot user
 
-VARIABLES=('REMS_OWNER' 'OWNER_KEY' 'ORG_OWNER_KEY')
+VARIABLES=('REMS_OWNER' 'REMS_OWNER_KEY' 'REMS_API_KEY')
 
 set -e
 
@@ -17,27 +17,28 @@ for VAR in "${VARIABLES[@]}"; do
 done
 
 USER_DESC=${USER_DESC-"organization owner user"}
-ORG_OWNER_USER=${ORG_OWNER_USER-"org-owner-robot"}
+REMS_USER_ID=${REMS_USER_ID-"org-owner-robot"}
 
-docker compose exec app java -Drems.config=/rems/config/config.edn -jar rems.jar api-key add $ORG_OWNER_KEY key for organization owner
+docker compose exec rems-app java -Drems.config=/rems/config/config.edn -jar rems.jar api-key add $REMS_API_KEY key for organization owner
 
+# create user through API, using owner credentials
 curl -X POST http://localhost:3000/api/users/create \
    -H "content-type: application/json" \
-   -H "x-rems-api-key: $OWNER_KEY" \
+   -H "x-rems-api-key: $REMS_OWNER_KEY" \
    -H "x-rems-user-id: $REMS_OWNER" \
    -d "{
-        \"userid\": \"$ORG_OWNER_USER\", \"name\": \"$USER_DESC\", \"email\": null
-   }"
+        \"userid\": \"$REMS_USER_ID\", \"name\": \"$USER_DESC\", \"email\": null
+    }"
 
 # grant role
-docker compose exec app java -Drems.config=/rems/config/config.edn -jar rems.jar grant-role user-owner $ORG_OWNER_USER
+docker compose exec rems-app java -Drems.config=/rems/config/config.edn -jar rems.jar grant-role user-owner $REMS_USER_ID
 # link user to api key
-docker compose exec app java -Drems.config=/rems/config/config.edn -jar rems.jar api-key set-users $ORG_OWNER_KEY $ORG_OWNER_USER
+docker compose exec rems-app java -Drems.config=/rems/config/config.edn -jar rems.jar api-key set-users $REMS_API_KEY $REMS_USER_ID
 # allow api key to use all /api GET endpoints
-docker compose exec app java -Drems.config=/rems/config/config.edn -jar rems.jar api-key allow $ORG_OWNER_KEY get '/api/.*'
+docker compose exec rems-app java -Drems.config=/rems/config/config.edn -jar rems.jar api-key allow $REMS_API_KEY get '/api/.*'
 # allow api key to use all /api POST endpoints
-docker compose exec app java -Drems.config=/rems/config/config.edn -jar rems.jar api-key allow $ORG_OWNER_KEY post '/api/.*'
+docker compose exec rems-app java -Drems.config=/rems/config/config.edn -jar rems.jar api-key allow $REMS_API_KEY post '/api/.*'
 
-echo Credentials:
-echo user id: $ORG_OWNER_USER
-echo api key: $ORG_OWNER_KEY
+echo Credentials created for organization owner user:
+echo user id: $REMS_USER_ID
+echo api key: $REMS_API_KEY

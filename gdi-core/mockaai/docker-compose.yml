@@ -14,7 +14,7 @@ services:
       - REMS_CLIENT_ID
       - REMS_CLIENT_SECRET
       - REPORTER_USER
-      - REPORTER_APIKEY
+      - REPORTER_API_KEY
     depends_on:
       - aai-db
     extra_hosts:
@@ -25,13 +25,14 @@ services:
       dockerfile: ./Dockerfile_mock_w_gomplate
     #container_name: ls-aai-mock
     volumes:
-      - "./configuration/aai-mock:/etc/lsaai-mock"
+      - ./configuration/aai-mock:/etc/lsaai-mock-tmpl:ro
       - ./docker-entrypoint.sh:/usr/local/tomcat/docker-entrypoint.sh:ro
     ports:
       - 127.0.0.1:4888:8080
     networks:
       - lsaaimock
       - tre-core
+    #command: ["sleep", "inf"]
 
   aai-db:
     image: mysql/mysql-server:latest

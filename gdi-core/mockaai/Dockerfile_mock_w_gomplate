@@ -2,5 +2,10 @@ FROM registry.gitlab.ics.muni.cz:443/perun/deployment/proxyidp/proxyidp-public-d
 # add gomplate to image, so we can use go templates
 COPY --from=hairyhenderson/gomplate:stable /gomplate /bin/gomplate
 
+USER 0
+# make directory that will be filled on container startup
+RUN mkdir -pm 777 /etc/lsaai-mock
+# return to regular user
+USER app
 # load our entrypoint instead of catalina directly
 CMD ["bash", "docker-entrypoint.sh"]

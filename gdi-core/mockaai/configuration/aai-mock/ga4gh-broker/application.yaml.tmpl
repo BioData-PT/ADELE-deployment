@@ -36,7 +36,7 @@ mock-broker:
       jwks: https://{{ env.Getenv "REMS_DOMAIN" }}/api/jwk
       headers:
         - header: x-rems-api-key
-          value: {{ env.Getenv "REPORTER_APIKEY" }}
+          value: {{ env.Getenv "REPORTER_API_KEY" }}
         - header: x-rems-user-id
           value: {{ env.Getenv "REPORTER_USER" }}
 
