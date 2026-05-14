@@ -72,7 +72,7 @@ make create-rems-roles
 
 ## Configuration
 
-The 
+The section below is not compulsory when testing the stack with a Mock OIDC client, but it is necessary when going to production and using LS AAI as the OIDC provider or when changing the architecture of the stack somehow.
 
 ### LS AAI OIDC Client
 You need to register an OIDC client in LS AAI for the TRE services to be able to use it as an Identity Provider.
