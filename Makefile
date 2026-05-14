@@ -29,6 +29,8 @@ create-rems-roles:
 	@BASH_ENV=.env bash ./gdi-core/rems/scripts/create_org_owner_user.sh
 	@echo "Creating reporter user..."
 	@BASH_ENV=.env bash ./gdi-core/rems/scripts/create_reporter_user.sh
+	@echo "Done! Restarting rems-app to apply changes..."
+	@docker compose restart rems-app
 	@echo All done!
 
 clean-rems-roles:
