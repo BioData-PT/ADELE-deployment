@@ -7,7 +7,7 @@ services:
     image: rems-template:latest
     build:
       context: .
-      dockerfile: ./Dockerfile_rems_w_gomplate
+      dockerfile: images/rems-template/Dockerfile_rems_w_gomplate
     depends_on:
       db:
         condition: service_started
@@ -29,6 +29,12 @@ services:
       - ./ls_login.png:/rems/theme/public/img/ls_login.png
       - credentials:/rems/keys/ # jwks
       - ./images/rems-template/docker-entrypoint.sh:/rems/docker-entrypoint.sh:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/health"] # returns 200 if healthy
+      interval: 5s
+      timeout: 30s
+      retries: 5
+      start_period: 10s
     networks:
       - rems-internal
       - tre-core

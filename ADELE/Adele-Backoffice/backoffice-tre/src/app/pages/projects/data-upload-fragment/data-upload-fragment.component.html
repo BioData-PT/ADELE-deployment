@@ -89,9 +89,17 @@
                 <small class="text-muted">This ID should match the name of the dataset in the Metadata Catalogue.</small>
               </div>
           </div>
+          <div *ngIf="statusMessage" class="alert mx-3 mb-0 mt-2 d-flex align-items-center"
+               [ngClass]="{'alert-success': statusType === 'success', 'alert-danger': statusType === 'error', 'alert-info': statusType === ''}">
+            <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+            <span>{{ statusMessage }}</span>
+          </div>
           <div class="modal-footer bg-light">
-            <button type="submit" class="btn btn-success">Submit</button>
-            <button type="button" class="btn btn-secondary" (click)="selectedFile = ''">Cancel</button>
+            <button type="submit" class="btn btn-success" [disabled]="isSubmitting">
+              <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isSubmitting ? 'Submitting…' : 'Submit' }}
+            </button>
+            <button type="button" class="btn btn-secondary" [disabled]="isSubmitting" (click)="selectedFile = ''">Cancel</button>
           </div>
           </div>
         </form>

@@ -75,6 +75,34 @@
   text-align: center;
 }
 
+.password-wrapper {
+  position: relative;
+}
+
+.password-input {
+  padding-right: 4rem;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: auto;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  margin-top: 0;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--input-border);
+  border-radius: 0.3rem;
+  cursor: pointer;
+  &:hover {
+    color: var(--text-main);
+    border-color: var(--accent);
+  }
+}
+
 .auth-footer {
   text-align: center;
   margin-top: 1.2rem;

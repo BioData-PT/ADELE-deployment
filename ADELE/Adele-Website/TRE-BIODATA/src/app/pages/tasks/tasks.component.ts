@@ -41,14 +41,36 @@ export class TasksComponent {
     );
   }
 
-  generatePresignedUri(task: any) {
-    this.taskService.generatePresignedUri(task.user, task.file_id).subscribe(
-      (data) => {
-        console.log('Presigned URI generated successfully:', data);
-        window.open(data.presigned_uri, '_blank');
+  viewOutput(task: any) {
+    task.outputError = '';
+    this.taskService.getTaskResult(task.user || task.user_id, task.file_id).subscribe(
+      (content) => {
+        task.output = content;
       },
       (error) => {
-        console.error('Error generating presigned URI:', error);
+        console.error('Error fetching task output:', error);
+        task.outputError = 'Could not load the output for this task.';
+      }
+    );
+  }
+
+  downloadOutput(task: any) {
+    task.outputError = '';
+    this.taskService.getTaskResult(task.user || task.user_id, task.file_id).subscribe(
+      (content) => {
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `task-${task.id}-output.txt`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      },
+      (error) => {
+        console.error('Error downloading task output:', error);
+        task.outputError = 'Could not download the output for this task.';
       }
     );
   }

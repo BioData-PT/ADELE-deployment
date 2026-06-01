@@ -2,6 +2,11 @@
 
 .vscode
 
+# C4GH pubkey files
+c4gh.pub
+c4gh.pub.pem
+c4gh.pub.pem.sha256
+
 # angular-generated files
 ADELE/Adele-Website/TRE-BIODATA/dist/
 **/.angular/cache/

@@ -20,7 +20,8 @@ services:
             - REPOSITORY_TYPE=4
             - REPOSITORY_GRAPHDB_URL=http://graphdb:7200
             - REPOSITORY_GRAPHDB_REPOSITORY=fdp
-            - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/fdp # use adele's instance
+            #- SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/fdp # use adele's instance
+            - SPRING_DATA_MONGODB_URI=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/fdp?authSource=${MONGO_INITDB_DATABASE}
 
         depends_on:
             mongodb:

@@ -84,8 +84,8 @@ getFile(passport: string): void {
       this.availableFiles[response.dataset] = response.files;
 
 
-      if (!this.datasets.some(ds => ds === response.dataset)) {
-        const dataset = { id: response.dataset, name: response.dataset };
+      if (!this.datasets.some(ds => ds.id === response.dataset)) {
+        const dataset = { id: response.dataset, name: response.dataset_name || response.dataset };
         this.datasets.push(dataset);
       }
 
