@@ -12,10 +12,10 @@ cp -r $TEMPLATE_FILETREE/* $CONF_FILETREE/
 
 # build mock client configurations from templates
 echo "Processing Go templates for Mock client configurations"
-for f in `find $CONF_CLIENT_DIR -name "*.tmpl"`; do
+for f in `find $TEMPLATE_CLIENT_DIR -name "*.tmpl"`; do
   name=$(basename "$f" .tmpl)
   echo "Processing template $f"
-  gomplate -f "$f" -o "$CONF_DIR/$name" && cat "$CONF_DIR/$name" || exit 1
+  gomplate -f "$f" -o "$CONF_CLIENT_DIR/$name" && cat "$CONF_CLIENT_DIR/$name" || exit 1
 done
 
 # build mock broker configuration from template

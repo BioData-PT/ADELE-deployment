@@ -89,17 +89,20 @@ When this is done, LS AAI will review your request and provide you with a client
 - Token endpoint authentication type: client_secret_basic
 - PKCE type: SHA256 code challenge
 - Issue refresh tokens for this client: No
+- Step 3 of the registration: Component-specific fields (see below)
 - Step 4 of the registration: No need to check or fill anything
 
 #### Component-specific fields
 
 ##### S&I
 - Scopes: openid, profile, email, ga4gh_passport_v1, eduperson_entitlement  
-- Redirect URI: base url  + */oidc/login* (e.g., https://login.tre.biodata.pt/oidc/login )
+- Redirect URIs: 
+    - Base url of storage domain + */oidc/login* (e.g., https://login.tre.biodata.pt/oidc/login )
+    - Base url of website API domain + */oidc-callback* (e.g., https://website-api.tre.biodata.pt/oidc-callback)
 
 ##### REMS
 - Scopes: openid, profile, email, ga4gh_passport_v1
-- Redirect URI: base url + */oidc-callback* (*e.g.*, https://rems.tre.biodata.pt/oidc-callback)
+- Redirect URIs: base url + */oidc-callback* (*e.g.*, https://rems.tre.biodata.pt/oidc-callback)
 
 ### Connection LS AAI -> REMS
 

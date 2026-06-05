@@ -2,14 +2,25 @@
 
 # If there are no certificates yet, dont use SSL and move everything to 8080 (not connected to the outside)
 # Nginx will need to be restarted (either manually or by the autoreload script) after certbot obtains the 
-# certificates for the first time, to start using SSL
+# certificates for the first time, to start using SSL. If there is a self-signed certificate, 
+# it will be used instead of the real one, until the real one is obtained.
+
 {{ $cert_path := env.Getenv "CERT_FILE" }}
+{{ $self_cert_path := printf "%s/%s.crt" (env.Getenv "DIR_SSL_CERT") (env.Getenv "SSLNAME") }}
 {{ if file.Exists $cert_path }}
+
 listen 443 ssl;
 #ssl_certificate /etc/letsencrypt/live/tre-cert/fullchain.pem;  
 #ssl_certificate_key /etc/letsencrypt/live/tre-cert/privkey.pem;
 ssl_certificate {{ env.Getenv "CERT_FILE" }};  
 ssl_certificate_key {{ env.Getenv "KEY_FILE" }};
+
+{{ else if file.Exists $self_cert_path }}
+# use self-signed certificate if it exists, until the real one is obtained
+listen 443 ssl;
+ssl_certificate {{ env.Getenv "DIR_SSL_CERT" }}/{{ env.Getenv "SSLNAME" }}.crt;  
+ssl_certificate_key {{ env.Getenv "DIR_SSL_KEY" }}/{{ env.Getenv "SSLNAME" }}.key;
+
 {{ else }}
 # deactivate every SSL server block
 listen 8080;
