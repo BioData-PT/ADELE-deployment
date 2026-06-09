@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment'; 
+import { Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -11,7 +12,7 @@ export class AuthService {
 
    private apiUri = environment.backendUrl;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private router: Router) {
     this.loadFromLocalStorage();
   }
 
@@ -48,7 +49,9 @@ export class AuthService {
     localStorage.removeItem('auth_role');
     localStorage.removeItem('auth_username');
     localStorage.removeItem('auth_name');
-    this.http.post('/api/user/logout', {}).subscribe();
+    this.http.post(`${this.apiUri}/api/user/logout`, {}).subscribe(() => {
+    this.router.navigate(['/login']);
+  });
   }
 
   getRole(): string | null {

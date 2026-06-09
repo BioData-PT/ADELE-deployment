@@ -7,6 +7,7 @@ import requests
 import jwt
 from flask_cors import CORS
 from pymongo import MongoClient
+from minio import Minio
 from config.settings import *
 from pathlib import Path
 import json
@@ -344,21 +345,45 @@ def runTask():
     access_token = request.cookies.get('access_token')
     
     template = resp['payload']
-    payload_str = json.dumps(template)
+    # Pipeline payloads are stored as JSON strings. Substitute the task-specific
+    # values into the raw text, then parse to a dict for the TES request.
+    payload_str = template if isinstance(template, str) else json.dumps(template)
+
+    # Pipelines that consume the task's file declare $INPUT_S3_URL. The SDA
+    # archive is crypt4gh-encrypted and Funnel cannot decrypt it (nor send a
+    # Bearer token), so we fetch the decrypted file from the SDA download
+    # server -- which holds the private key -- and stage it into plain S3 for
+    # Funnel to mount into the execution container.
+    input_s3_url = ""
+    if "$INPUT_S3_URL" in payload_str:
+        try:
+            dl = requests.get(f"{DOWNLOAD_S3.rstrip('/')}/files/{file_id}",
+                              headers={"Authorization": f"Bearer {access_token}"}, timeout=120)
+            dl.raise_for_status()
+        except requests.RequestException as e:
+            return jsonify({"error": f"Failed to fetch file from archive: {str(e)}"}), 502
+        content = dl.content
+        minio_client = Minio(MINIO_ENDPOINT, access_key=MINIO_ACCESS_KEY,
+                             secret_key=MINIO_SECRET_KEY, secure=False)
+        if not minio_client.bucket_exists("taskinput"):
+            minio_client.make_bucket("taskinput")
+        minio_client.put_object("taskinput", file_id, io.BytesIO(content), length=len(content))
+        input_s3_url = f"s3://taskinput/{file_id}"
 
     values = {
     "$USER_NAME": user_id,
     "$FILE_ID": file_id,
     "$PIPELINE_ID": pipeline_id,
-    "$TOKEN": access_token
+    "$TOKEN": access_token,
+    "$INPUT_S3_URL": input_s3_url
     }
 
     for key, value in values.items():
-        payload_str = payload_str.replace(key, value)
+        payload_str = payload_str.replace(key, value or "")
 
     payload = json.loads(payload_str)
 
-    response = requests.post(FUNNEL_URI, headers={"Accept": "application/json", "Content-Type": "application/json"}, data=payload)
+    response = requests.post(FUNNEL_URI, headers={"Accept": "application/json", "Content-Type": "application/json"}, json=payload)
 
     existing_task = tasksDB.find_one({
         "user_id": user_id,
@@ -376,6 +401,7 @@ def runTask():
     tasksDB.insert_one({
         "task_id": response.json().get("id"),
         "user_id": user_id,
+        "user": user_id,
         "pipeline_id": pipeline_id,
         "file_id": file_id,
         "status": response.json().get("state", "PENDING"),

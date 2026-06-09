@@ -27,7 +27,10 @@
                 <td>{{ task.status }}</td>
                 <td>{{ task.created_at | date:'short' }}</td>
                 <td>
-                    <button *ngIf="task.status == 'COMPLETED'" class="btn btn-success" (click)="generatePresignedUri(task)">Download File</button>
+                    <button *ngIf="task.status == 'COMPLETED'" class="btn btn-success" (click)="viewOutput(task)">View Output</button>
+                    <button *ngIf="task.status == 'COMPLETED'" class="btn btn-outline-success ms-2" (click)="downloadOutput(task)">Download</button>
+                    <div *ngIf="task.outputError" class="text-danger mt-2">{{ task.outputError }}</div>
+                    <pre *ngIf="task.output != null" class="mt-2 p-2 bg-light border rounded" style="white-space: pre-wrap; word-break: break-all;">{{ task.output }}</pre>
                 </td>
             </tr>
             </tbody>

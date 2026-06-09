@@ -30,8 +30,12 @@ def register():
         "role": data["role"]
     }
     staffDB.insert_one(user)
+    session['user_id'] = str(user['_id'])
+    session['username'] = user['username']
+    session['role'] = user['role']
+    session.permanent = True
     audit_logger.info(f"REGISTER | SUCCESS | username={user['username']} | role={user['role']} | IP={request.remote_addr}")
-    return jsonify({"message": "User registered"}), 201
+    return jsonify({"message": "User registered", "name": user["name"], "role": user["role"]}), 201
 
 @user_bp.route('/login', methods=['POST'])
 def login():
@@ -70,7 +74,7 @@ def me():
     if not user.get('role') or user['role'] != role:
         audit_logger.warning(f"ME | ROLE_MISMATCH_OR_NOT_FOUND | user_id={user_id} | username={username} | role={role} | IP={request.remote_addr}")
         return jsonify({"error": "User role not found"}), 404
-    if not user.get('name') or user['name'].strip() == "" or user['name'] != username:
+    if not user.get('name') or user['name'].strip() == "":
         audit_logger.warning(f"ME | NAME_MISSING_OR_NOT_FOUND | user_id={user_id} | username={username} | role={role} | IP={request.remote_addr}")
         return jsonify({"error": "User name is missing"}), 400
     audit_logger.info(f"ME | SUCCESS | user_id={user_id} | username={username} | role={role} | IP={request.remote_addr}")

@@ -39,4 +39,11 @@ export class TaskService {
     return this.http.get(`${this.backendUri}/si/generate-presigned-uri/${user}/${fileId}`, { withCredentials: true });
   }
 
+  getTaskResult(user: string, fileId: string): Observable<string> {
+    return this.http.get(
+      `${this.backendUri}/si/result/${encodeURIComponent(user)}/${encodeURIComponent(fileId)}`,
+      { withCredentials: true, responseType: 'text' }
+    );
+  }
+
 }

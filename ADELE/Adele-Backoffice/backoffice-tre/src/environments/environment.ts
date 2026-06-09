@@ -1,3 +1,3 @@
 export const environment = {
-  backendUrl: "https://backoffice-api.adele.inesc-id.pt",
+  backendUrl: "https://backoffice-api.adelefortest.com",
 };

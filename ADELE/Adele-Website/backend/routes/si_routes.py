@@ -97,7 +97,6 @@ def get_files():
         return jsonify({"error": "Invalid JSON response from file server"}), 502
 
     files = []
-    print(f"Response data: {response_data}")  # Debugging line to check the response structure
     for file in response_data:
         if all(k in file for k in ('fileId', 'displayFileName', 'fileStatus')):
             files.append({
@@ -105,8 +104,27 @@ def get_files():
                 'status': file['fileStatus']
             })
 
+    # Resolve a human-readable dataset name from the REMS catalogue item whose
+    # resource id matches this dataset; fall back to the raw id if not found.
+    dataset_name = dataset_id
+    try:
+        rems_resp = requests.get(
+            f"{REMS_API}/catalogue-items",
+            headers={"x-rems-api-key": REMS_API_KEY, "x-rems-user-id": REMS_USER_ID},
+            timeout=10
+        )
+        if rems_resp.ok:
+            for item in rems_resp.json():
+                if item.get('resid') == dataset_id:
+                    title = item.get('localizations', {}).get('en', {}).get('title')
+                    if title:
+                        dataset_name = title
+                        break
+    except requests.RequestException as e:
+        audit_logger.warning(f"SI_GET_FILES | REMS_NAME_LOOKUP_FAIL | dataset_id={dataset_id} | error={str(e)}")
+
     audit_logger.info(f"SI_GET_FILES | SUCCESS | user_id={user_id} | dataset_id={dataset_id} | IP={user_ip} | files_count={len(files)}")
-    return jsonify({"dataset": dataset_id, "files": files}), 200
+    return jsonify({"dataset": dataset_id, "dataset_name": dataset_name, "files": files}), 200
 
 
 @si_bp.route('/files/<file_id>', methods=['GET'])
@@ -154,7 +172,7 @@ def generate_presigned_uri(username, filename):
     access_token = request.cookies.get('access_token')
     if not access_token:
         return jsonify({"error": "Missing access token in cookies"}), 401
-    
+
     # Decode the JWT to get the current user
     try:
         passport = jwt.decode(access_token, options={"verify_signature": False})
@@ -162,31 +180,51 @@ def generate_presigned_uri(username, filename):
     except Exception as e:
         print(f"[ERROR] Failed to decode JWT: {e}")
         return jsonify({"error": "Invalid access token"}), 401
-    
-    # Initialize MinIO client
-    minio_client = Minio(
-        MINIO_ENDPOINT, 
-        access_key=MINIO_ACCESS_KEY,
-        secret_key=MINIO_SECRET_KEY,
-        secure=False # Change to TRUE if HTTPS is required
-    ) 
 
     if current_user != username:
         return jsonify({"error": "Unauthorized access"}), 403
 
-    object_path = f"{username}/{filename}"
+    # The S3 store is only reachable inside the docker network, so an S3
+    # presigned URL is not usable by the browser. Hand back a URL to this
+    # backend's own streaming endpoint instead.
+    result_url = f"{request.host_url}si/result/{username}/{filename}"
+    return jsonify({"presigned_uri": result_url, "uri": result_url}), 200
+
+
+@si_bp.route("/result/<username>/<path:filename>", methods=["GET"])
+def get_task_result(username, filename):
+    """Stream an approved task-output object from the 'results' bucket."""
+    access_token = request.cookies.get('access_token')
+    if not access_token:
+        return jsonify({"error": "Missing access token in cookies"}), 401
 
     try:
-        uri = minio_client.presigned_get_object(
-            "results",                  # bucket name
-            object_path,                # path inside bucket
-            expires=timedelta(days=1)  # validity of the link
-        )
-        return jsonify({"uri": uri}), 200
-
+        passport = jwt.decode(access_token, options={"verify_signature": False})
+        current_user = passport.get('sub', 'unknown')
     except Exception as e:
-        print(f"[ERROR] {e}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Invalid access token"}), 401
+
+    if current_user != username:
+        return jsonify({"error": "Unauthorized access"}), 403
+
+    minio_client = Minio(
+        MINIO_ENDPOINT,
+        access_key=MINIO_ACCESS_KEY,
+        secret_key=MINIO_SECRET_KEY,
+        secure=False
+    )
+
+    try:
+        obj = minio_client.get_object("results", f"{username}/{filename}")
+        data = obj.read()
+        obj.close()
+        obj.release_conn()
+    except S3Error as e:
+        return jsonify({"error": f"Result not found: {str(e)}"}), 404
+
+    resp = make_response(data)
+    resp.headers["Content-Type"] = "text/plain; charset=utf-8"
+    return resp
 
 
 @si_bp.route("/upload/file/<filename>", methods=["POST"])
@@ -288,7 +326,7 @@ def upload_file(filename):
     projectDB.update_one(
         {"_id": ObjectId(project_id)},
         {"$push": {"files": {
-            "file_id": file_id
+            "file_id": file_id_str
         }}}
     )
 

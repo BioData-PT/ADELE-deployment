@@ -20,11 +20,16 @@ export class DataUploadFragmentComponent {
   selectedFile = '';
   selectedFileId=  '';
 
+  // Ingest submission state, surfaced in the modal so the admin gets feedback.
+  isSubmitting = false;
+  statusMessage = '';
+  statusType: 'success' | 'error' | '' = '';
+
   fileForm = new FormGroup({
     filename: new FormControl(''),
     unique_id_suffix: new FormControl('', [Validators.required]),
     dataset_id_suffix: new FormControl('', [Validators.required]),
-    rems_catalogue_id: new FormControl('')
+    rems_catalogue_id: new FormControl('', [Validators.required])
   });
 
   constructor(private fileManagementService: FileManagementService) { }
@@ -52,32 +57,43 @@ export class DataUploadFragmentComponent {
     formData.append('dataset_id', this.datasetIdPrefix + (this.fileForm.value.dataset_id_suffix || ''));
     formData.append('rems_catalogue_id', this.fileForm.value.rems_catalogue_id || '');
 
+    this.isSubmitting = true;
+    this.statusType = '';
+    this.statusMessage = 'Ingesting file… this can take a couple of minutes.';
+
     this.fileManagementService.processFile(formData).subscribe(
       (res: any) => {
+        // A 2xx response means the SDA pipeline + REMS update succeeded.
         console.log('Response from processFile:', res);
-        if (res.success) {
-          console.log(`File ${this.fileForm.value.filename} processed successfully.`);
-          // remove the extension from filename
-          const filename = this.fileForm.value.filename || '';
-          const filenameWithoutExtension = filename.replace(/\.[^/.]+$/, "");
-          console.log(`Filename without extension: ${filenameWithoutExtension}`);
-          this.fileManagementService.fileIngested(this.selectedFileId).subscribe(
-            (res: any) => {
-              console.log(`File ingested successfully: ${res}`);
-            },
-            (error: any) => {
-              console.error(`Error ingesting file: ${error}`);
-            }
-          );
-          this.resetSelectedFile();
-        } else {
-          console.error(`Failed to process file ${this.fileForm.value.filename}:`, res);
-        }
+        this.statusType = 'success';
+        this.statusMessage = (res && res.message) || 'File ingested successfully.';
+
+        // Mark the file as ingested in the project DB; non-fatal if it fails.
+        this.fileManagementService.fileIngested(this.selectedFileId).subscribe({
+          next: () => console.log('File status updated to ingested.'),
+          error: (error: any) => console.error('Error updating file status:', error)
+        });
+
+        this.isSubmitting = false;
+        // Refresh the file list so the ingested file reflects its new state.
+        this.refreshFiles();
       },
       (error: any) => {
         console.error(`Error processing file ${this.fileForm.value.filename}:`, error);
+        this.isSubmitting = false;
+        this.statusType = 'error';
+        this.statusMessage =
+          (error && error.error && error.error.error) ||
+          'File ingestion failed. Please try again.';
       }
     );
+  }
+
+  refreshFiles() {
+    this.fileManagementService.getProjectFiles(this.project.id).subscribe({
+      next: (response: any) => { this.files = response.files; },
+      error: (error: any) => console.error('Error refreshing project files:', error)
+    });
   }
 
   showFileForm(file: any) {
@@ -90,6 +106,9 @@ export class DataUploadFragmentComponent {
 
     this.selectedFile = file.filename;
     this.selectedFileId = file.file_id;
+    this.statusMessage = '';
+    this.statusType = '';
+    this.isSubmitting = false;
     this.fileForm.patchValue({
       filename: file.file_id + '.c4gh',
       unique_id_suffix: unique_id_suffix,
@@ -99,9 +118,16 @@ export class DataUploadFragmentComponent {
   }
 
   submitFileForm() {
-    if (this.fileForm.valid) {
-      this.ingestFile();
+    if (this.isSubmitting) {
+      return;
     }
+    if (this.fileForm.invalid) {
+      this.fileForm.markAllAsTouched();
+      this.statusType = 'error';
+      this.statusMessage = 'Please fill in all required fields before submitting.';
+      return;
+    }
+    this.ingestFile();
   }
 
   resetSelectedFile(){
